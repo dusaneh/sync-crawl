@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -169,3 +170,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+=======
+# Example .gitignore content
+keys.py
+token.json
+>>>>>>> 253cdfc (Initial commit)
