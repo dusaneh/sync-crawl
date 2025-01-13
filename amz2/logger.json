@@ -1,0 +1,55 @@
+{
+  "workflows": {
+    "amz2": {
+      "created_at": "2025-01-12T22:44:10.628931",
+      "open_log": [],
+      "site_wide_instructions": "Amazon Online Website",
+      "workflow_instructions": "Click on TOMS women's Alpargata Slip Ons from the Similar to my past purchases section",
+      "samples": {
+        "0": {
+          "created_at": "2025-01-12T22:44:12.645114",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T22:44:12.649112",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T22:44:12.654109",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T22:44:12.661104",
+                      "open_log": [],
+                      "summary_of_steps_so_far": "No steps have been taken yet.",
+                      "expected_outcome_hopeful": "The browser should navigate to the detailed product page for the TOMS Women's Alpargata Slip On Flats where users can view more information and purchase options.",
+                      "_advice_assessment": "This is the first step, so there is no previous advice to assess.",
+                      "actions": {
+                        "0": {
+                          "created_at": "2025-01-12T22:45:48.851548",
+                          "open_log": [],
+                          "description": "Click on the TOMS Women's Alpargata Slip On Flats product listing",
+                          "candidates": {
+                            "0": {
+                              "created_at": "2025-01-12T22:45:48.856546",
+                              "open_log": [],
+                              "element_description": "TOMS Women's Alpargata Slip On Flats product card showing a gray shoe with a price of $29.40, located in the Similar to your past purchases section",
+                              "type_text": "",
+                              "keyboard_action": "",
+                              "action": "click",
+                              "to_act": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "workflows": {
+    "amz7": {
+      "created_at": "2025-01-12T23:42:08.650255",
+      "open_log": [],
+      "site_wide_instructions": "Amazon Online Website",
+      "workflow_instructions": "Click on TOMS women's Alpargata Slip Ons from the Similar to my past purchases section",
+      "samples": {
+        "0": {
+          "created_at": "2025-01-12T23:42:11.031468",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T23:42:11.033464",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T23:42:11.035463",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T23:42:11.038461",
+                      "open_log": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "1": {
+          "created_at": "2025-01-12T23:42:21.466732",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T23:42:21.470730",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T23:42:21.472729",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T23:42:21.476727",
+                      "open_log": [],
+                      "summary_of_steps_so_far": "No steps have been taken yet.",
+                      "expected_outcome_hopeful": "The system should navigate to the product detail page for the TOMS Women's Alpargata Canvas Slip On shoes where more detailed product information will be available.",
+                      "_advice_assessment": "No previous advice to assess as this is the first step.",
+                      "actions": {
+                        "0": {
+                          "created_at": "2025-01-12T23:42:56.016543",
+                          "open_log": [],
+                          "description": "Click on the TOMS Women's Alpargata Canvas Slip On product listing",
+                          "candidates": {
+                            "0": {
+                              "created_at": "2025-01-12T23:42:56.020513",
+                              "open_log": [],
+                              "element_description": "TOMS Women's Alpargata Canvas Slip On product listing showing a black slip-on shoe with a price of $31.42, located on the right side of the screen",
+                              "type_text": "",
+                              "keyboard_action": "",
+                              "action": "click",
+                              "to_act": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

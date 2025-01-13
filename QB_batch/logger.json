@@ -1,0 +1,190 @@
+{
+  "workflows": {
+    "QB_batch": {
+      "created_at": "2025-01-12T19:31:41.402334",
+      "open_log": [],
+      "site_wide_instructions": "Quickbooks Online Website",
+      "workflow_instructions": "Inactivate several customers in a batch action. On the customer page (found through the sales page), you should be able to select several customers and take batch actions like inactivate",
+      "samples": {
+        "0": {
+          "created_at": "2025-01-12T19:31:41.699537",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T19:31:41.701538",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T19:31:41.704535",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T19:31:41.708532",
+                      "open_log": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "1": {
+          "created_at": "2025-01-12T19:32:15.009497",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T19:32:15.012495",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T19:32:15.016494",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T19:32:15.021490",
+                      "open_log": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "2": {
+          "created_at": "2025-01-12T19:33:52.195460",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T19:33:52.197441",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T19:33:52.199438",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T19:33:52.203455",
+                      "open_log": [],
+                      "summary_of_steps_so_far": "No steps have been taken yet. This appears to be the starting point.",
+                      "expected_outcome_hopeful": "After clicking on Customers & leads, we should be taken to a page where we can view and manage customer records, which will allow us to perform batch actions on multiple customers.",
+                      "_advice_assessment": "No previous advice to assess as this is the first step.",
+                      "actions": {
+                        "0": {
+                          "created_at": "2025-01-12T19:34:12.210537",
+                          "open_log": [],
+                          "description": "Navigate to the Customers & leads section",
+                          "candidates": {
+                            "0": {
+                              "created_at": "2025-01-12T19:34:12.214508",
+                              "open_log": [],
+                              "element_description": "The 'Customers & leads' menu item in the left navigation panel",
+                              "type_text": "",
+                              "keyboard_action": "",
+                              "action": "click",
+                              "to_act": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "3": {
+          "created_at": "2025-01-12T19:34:30.421238",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T19:34:30.423207",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T19:34:30.426206",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T19:34:30.430204",
+                      "open_log": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "4": {
+          "created_at": "2025-01-12T19:35:33.763490",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T19:35:33.766488",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T19:35:33.771486",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T19:35:33.779482",
+                      "open_log": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "5": {
+          "created_at": "2025-01-12T19:57:46.966441",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T19:57:46.972437",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T19:57:46.977456",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T19:57:46.984430",
+                      "open_log": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "6": {
+          "created_at": "2025-01-12T19:59:02.589519",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T19:59:02.593516",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T19:59:02.597487",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T19:59:02.610480",
+                      "open_log": [],
+                      "summary_of_steps_so_far": "No steps have been taken yet.",
+                      "expected_outcome_hopeful": "We need to first access QuickBooks Online before we can proceed with customer batch operations.",
+                      "_advice_assessment": "No previous advice to assess as this is the first step."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

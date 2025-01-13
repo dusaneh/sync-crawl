@@ -1,0 +1,77 @@
+{
+  "workflows": {
+    "amz3": {
+      "created_at": "2025-01-12T22:50:33.697476",
+      "open_log": [],
+      "site_wide_instructions": "Amazon Online Website",
+      "workflow_instructions": "Click on TOMS women's Alpargata Slip Ons from the Similar to my past purchases section",
+      "samples": {
+        "0": {
+          "created_at": "2025-01-12T22:50:49.572449",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T22:50:49.576447",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T22:50:49.581451",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T22:50:49.586463",
+                      "open_log": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "1": {
+          "created_at": "2025-01-12T22:51:07.641331",
+          "open_log": [],
+          "reruns": {
+            "0": {
+              "created_at": "2025-01-12T22:51:07.646326",
+              "open_log": [],
+              "runs": {
+                "0": {
+                  "created_at": "2025-01-12T22:51:07.651345",
+                  "open_log": [],
+                  "run_retries": {
+                    "0": {
+                      "created_at": "2025-01-12T22:51:07.658317",
+                      "open_log": [],
+                      "summary_of_steps_so_far": "No steps have been taken yet.",
+                      "expected_outcome_hopeful": "The browser should navigate to the detailed product page for the TOMS Women's Alpargata Slip On Flats where users can view more information and purchase options.",
+                      "_advice_assessment": "This is the first step, so there is no previous advice to assess.",
+                      "actions": {
+                        "0": {
+                          "created_at": "2025-01-12T22:51:43.399484",
+                          "open_log": [],
+                          "description": "Click on the TOMS Women's Alpargata Slip On Flats product listing",
+                          "candidates": {
+                            "0": {
+                              "created_at": "2025-01-12T22:51:43.407509",
+                              "open_log": [],
+                              "element_description": "TOMS Women's Alpargata Slip On Flats product card showing a gray shoe with a price of $29.40, located in the Similar to your past purchases section",
+                              "type_text": "",
+                              "keyboard_action": "",
+                              "action": "click",
+                              "to_act": true
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -29,6 +29,7 @@ WEIGHTS = {'tess': 0.2, 'opencv': 1, 'dom': 1}
 FONTSIZE = 15
 
 
+
 # Modify OCR types and weights
 modified_types_of_ocr = []
 weights_mod = {}
@@ -127,42 +128,42 @@ def resize_and_crop(input_path, output_path, x=None, y=None, padding=0):
 
 
 
-def convert_coordinates(coordinates, conversion_info, bounding_box=None):
-    # bounding_box = {'left': 1, 'top': 2, 'right': 1000, 'bottom': 391}
-    # Extract conversion details
-    original_width = conversion_info['original_width']
-    original_height = conversion_info['original_height']
-    new_width = conversion_info['new_width']
-    new_height = conversion_info['new_height']
+# def convert_coordinates(coordinates, conversion_info, bounding_box=None):
+#     # bounding_box = {'left': 1, 'top': 2, 'right': 1000, 'bottom': 391}
+#     # Extract conversion details
+#     original_width = conversion_info['original_width']
+#     original_height = conversion_info['original_height']
+#     new_width = conversion_info['new_width']
+#     new_height = conversion_info['new_height']
 
-    # If bounding box is provided, adjust the coordinates within the bounding box first
-    if bounding_box:
-        left = bounding_box['left']
-        top = bounding_box['top']
-        right = bounding_box['right']
-        bottom = bounding_box['bottom']
+#     # If bounding box is provided, adjust the coordinates within the bounding box first
+#     if bounding_box:
+#         left = bounding_box['left']
+#         top = bounding_box['top']
+#         right = bounding_box['right']
+#         bottom = bounding_box['bottom']
 
-        # Width and height of the bounding box
-        box_width = right - left
-        box_height = bottom - top
+#         # Width and height of the bounding box
+#         box_width = right - left
+#         box_height = bottom - top
 
-        # Normalize the coordinates within the bounding box to get their relative position
-        x_within_box = coordinates['x'] / box_width
-        y_within_box = coordinates['y'] / box_height
+#         # Normalize the coordinates within the bounding box to get their relative position
+#         x_within_box = coordinates['x'] / box_width
+#         y_within_box = coordinates['y'] / box_height
 
-        # Map the coordinates to the new image dimensions
-        coordinates['x'] = left + x_within_box * box_width
-        coordinates['y'] = top + y_within_box * box_height
+#         # Map the coordinates to the new image dimensions
+#         coordinates['x'] = left + x_within_box * box_width
+#         coordinates['y'] = top + y_within_box * box_height
 
-    # Convert coordinates from new image back to original image
-    x_ratio =  original_width / new_width 
-    y_ratio = original_height / new_height
+#     # Convert coordinates from new image back to original image
+#     x_ratio =  original_width / new_width 
+#     y_ratio = original_height / new_height
 
 
-    scaled_x = coordinates['x'] * x_ratio
-    scaled_y = coordinates['y'] * y_ratio
+#     scaled_x = coordinates['x'] * x_ratio
+#     scaled_y = coordinates['y'] * y_ratio
 
-    return {'x': scaled_x, 'y': scaled_y}
+#     return {'x': scaled_x, 'y': scaled_y}
 
 def get_action_and_candidate(payload, action_id, candidate_id):
     """
@@ -392,10 +393,17 @@ def copy_and_rename_file(old_path, new_path,delete_original=True):
             os.remove(old_path)
         #print(f"Original file deleted: {old_path}")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Error copying file: {e}")
 
 
 def get_page_action_prompt(workflow_instructions, workflow_memory, extra_instructions=None, site_wide_instructions=None, dimension_info=None):
+    
+    dims = ''
+    i = 1
+    for c in dimension_info['chunks']:
+        dims += f"Image: {i} has a width of {c['dimensions']['width']} and a height of {c['dimensions']['height']}\n"
+        i += 1
+    
     prompt = f"""
 
 You are part of a system that automates the exploration and documentation of web application workflows by analyzing UI states and interactions. Your role is to assist in navigating through product features by identifying and evaluating UI elements and their interactions, following standard user paths as designed in the product. Each workflow you analyze will be used to create customer support documentation, so you must prioritize generic, widely-applicable interactions that match the product's intended functionality, avoiding user-specific data or shortcuts. Avoid also asking for help through search bars for functionality questions. Search and self-help processes can be used for other things other than functional support. Your analysis should focus on actions that would be clear and repeatable in support documentation. When evaluating UI states and suggesting actions, consider how these steps would be documented for support agents and end users - they must follow standard navigation patterns and represent how the product is meant to be used. The goal is to build verified, standardized workflow guides that support agents can confidently share with customers. Don't use shortcuts or links available which don't appear to be perscriptive by web designers and seem temporary or a part of some recommendation system which could vary user by user.
@@ -405,7 +413,8 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
     Instructions:
 
     Given:
-    Image: A screenshot of a webpage with width {dimension_info['new_width']} and height {dimension_info['new_height']}.
+    Image: Given {len(dimension_info['chunks'])} screenshot(s) of a webpage with the following dimensions:
+    {dims}
 
     -Your task is to analyze the next steps required to accomplish the given page action based ONLY on what you can observe in the screenshot, considering any prior action history. 
     -Behave like an expert test user and suggest appropriate actions to complete the page action. Make reasonable assumptions if needed. Try to suggest actions which are generalizable and don't pertain to a currently logged in user's data or product configuration. You will recieve screenshots after every action so you can see the results of your actions. 
@@ -484,7 +493,8 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
                         "type_text": "string",  // Text string to type if action is "type"
                         "expected_outcome": "string",  // Expected outcome after this specific action
                         "keyboard_action": "string",  // Keyboard action if applicable: "Enter", "Backspace", "Delete", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Tab", "Escape"
-                        "coordinates": {  // Location of the element
+                        "image_number": int,  // (1-"""+str(len(dimension_info['chunks']))+""") Represents the image number which best represents where the element is located (it could be represented in multiple screenshots, but pick the one where it's most visible)
+                        "coordinates": {  // Location of the element within the given image (see image dimensions above for reference when creating coordinates)
                             "x": int,
                             "y": int
                         }
@@ -776,7 +786,7 @@ def dict_json(data=None, file_path=None, action="save"):
             raise ValueError("Action must be either 'save' or 'load'.")
     
     except (json.JSONDecodeError, ValueError, UnicodeDecodeError) as e:
-        print(f"An error occurred: {e}")
+        print(f"Error loading JSON file: {e}")
         return None
 
 
@@ -815,9 +825,11 @@ def save_or_load_pickle(filepath, data=None, mode='save'):
                 loaded_data = pickle.load(f)
                 return loaded_data
         except (pickle.UnpicklingError, EOFError) as e: # Handle potential pickle loading errors
+            print(f"Error loading pickle file: {e}")
             raise Exception(f"Error loading pickle file: {e}") # Re-raise with a more informative message
 
     else:
+        print(f"Invalid mode. Must be 'save' or 'load'.")
         raise ValueError("Invalid mode. Must be 'save' or 'load'.")
 
 
@@ -883,7 +895,7 @@ def evaluate_run_screenshots(workflow_memory, site_wide_instructions, run_rerun_
 
 
 # Function to analyze raw screenshot
-def analyze_raw_screenshot(workflow_memory, extra_instructions, site_wide_instructions, resized_image_path, workflow_instructions, dimension_info, run_id,advice,summary):
+def analyze_raw_screenshot(workflow_memory, extra_instructions, site_wide_instructions, resized_image_paths, workflow_instructions, dimension_info, resize_screenshot_result_all_chunks,run_id,advice,summary):
     if len(advice)+len(summary) > 0:
         extra_instructions = f"{summary} /n{advice}"
         #print(f"Advice applied: {advice}")
@@ -896,13 +908,13 @@ def analyze_raw_screenshot(workflow_memory, extra_instructions, site_wide_instru
 
     #print(f"PROMPT for runID {run_id}: ",action_prompt)
 
-    page_action_json_all = analyze_page_actions(screenshot_path=[resized_image_path], prompt=action_prompt, api='claude')
+    page_action_json_all = analyze_page_actions(screenshot_path=resized_image_paths, prompt=action_prompt, api='claude')
 
     try:
-        page_action_json_ranked = filter_and_rank_outcome(page_action_json_all, dimension_info)
+        page_action_json_ranked = filter_and_rank_outcome(page_action_json_all, dimension_info,resize_screenshot_result_all_chunks)
         return page_action_json_ranked
     except Exception as e:
-        print(e)
+        print(f"Error in filter_and_rank_outcome: {e}")
         return page_action_json_all
 
 import requests
@@ -910,14 +922,14 @@ import requests
 # ... other functions in helper.py ...
 
 # helper.py
-def filter_and_rank_outcome(data, dimension_info):
+def filter_and_rank_outcome(data, dimension_info,resize_screenshot_result_all_chunks):
     modified_data = copy.deepcopy(data)
     modified_data['action_tasks'] = []
     ai = 0
 
     # Ratios for conversion
-    x_ratio = dimension_info['original_width'] / dimension_info['new_width']
-    y_ratio = dimension_info['original_height'] / dimension_info['new_height']
+    # x_ratio = resize_screenshot_result_all_chunks['original_width'] / resize_screenshot_result_all_chunks['new_width']
+    # y_ratio = resize_screenshot_result_all_chunks['original_height'] / resize_screenshot_result_all_chunks['new_height']
 
     for task in data['action_tasks']:
         for candidate in task['candidates']:
@@ -929,10 +941,31 @@ def filter_and_rank_outcome(data, dimension_info):
 
             # Convert coordinates to original image space
             if 'coordinates' in candidate and candidate['coordinates'] is not None:
+
+                c_for_ratio = resize_screenshot_result_all_chunks[f'chunk_{candidate['image_number']}.png']
+                print(c_for_ratio)
+                x_ratio = c_for_ratio['original_width'] / c_for_ratio['new_width']
+                y_ratio = c_for_ratio['original_height'] / c_for_ratio['new_height']
+                print(x_ratio,y_ratio)
+
+                add_height = 0
+                for c in dimension_info['chunks']:
+                    if c['chunk_number'] == candidate['image_number']:
+                        add_height = c['coordinates']['top'] #* y_ratio
+                        print(f"{c} was the right chunk")
+                        break
+
+                candidate['scroll_to']=add_height
                 candidate['coordinates_ready_to_act'] = {
                     'x': candidate['coordinates']['x'] * x_ratio,
                     'y': candidate['coordinates']['y'] * y_ratio
                 }
+                candidate['coordinates_ready_to_draw'] = {
+                    'x': candidate['coordinates']['x'] * x_ratio,
+                    'y': candidate['coordinates']['y'] * y_ratio+add_height
+                }
+
+                print(f"Coordinates for action {ai} candidate: {candidate['coordinates_ready_to_act']} where previously {candidate['coordinates']} and we scrolled to {add_height}")
 
         sorted_candidates = sorted(task['candidates'], key=lambda x: x['combined_score'], reverse=True)
         for rank, candidate in enumerate(sorted_candidates, start=1):
@@ -952,7 +985,7 @@ def filter_and_rank_outcome(data, dimension_info):
 
 
 
-def send_action_request(payload, wait_time):
+def send_action_request(payload, wait_time,run_rerun_path):
     """
     Sends a POST request to the FastAPI endpoint with the given payload and wait_time.
 
@@ -963,11 +996,11 @@ def send_action_request(payload, wait_time):
     url = "http://127.0.0.1:8000/perform-actions"  # Update the URL if the endpoint runs on a different host/port
 
     try:
-        response = requests.post(url, json=payload, params={"wait_time": wait_time})
+        response = requests.post(url, json=payload, params={"wait_time": wait_time, "run_rerun_path": run_rerun_path})
         response.raise_for_status()  # Raise an HTTPError if the response status is 4xx/5xx
         return response.json()
     except requests.RequestException as e:
-        print(f"An error occurred: {e}")
+        print(f"Error sending action request: {e}")
         return None
 
 # helper.py
@@ -1007,12 +1040,13 @@ def draw_elements(page_action_json: dict, draw_dots: bool, diameter=20, introduc
         candidates = task.get("candidates", [])
         for candidate in candidates:
             if candidate.get("to_act", False):
-                coordinates_ready_to_act = candidate.get("coordinates_ready_to_act", {})  # Use original coordinates, NOT coordinates_ready_to_act
-                if coordinates_ready_to_act and coordinates_ready_to_act.get("x") is not None and coordinates_ready_to_act.get("y") is not None:
+                coordinates_ready_to_draw = candidate.get("coordinates_ready_to_draw", {})  # Use original coordinates, NOT coordinates_ready_to_act
+                if coordinates_ready_to_draw and coordinates_ready_to_draw.get("x") is not None and coordinates_ready_to_draw.get("y") is not None:
                     #print(f"Adding dot at coordinates: {coordinates_ready_to_act}")
                     elements.append({
-                        "x": coordinates_ready_to_act.get("x"),  # Keep in image space
-                        "y": coordinates_ready_to_act.get("y"),  # Keep in image space
+                        "x": coordinates_ready_to_draw.get("x"),  # Keep in image space
+                        "y": coordinates_ready_to_draw.get("y"),  # Keep in image space
+                        "scroll_to": candidate.get("scroll_to"),
                         "action_id": task.get('action_id'),
                         "candidate_id": candidate.get('candidate_id')
                     })
@@ -1181,31 +1215,35 @@ def create_highlighted_screenshot_cairo(run_id, run_rerun_path, page_action_json
 
 # ... (other functions in helper.py) ...
 
-def perform_llm_analysis(workflow_memory, extra_instructions, site_wide_instructions, run_rerun_path, workflow_instructions, resize_screenshot_result, run_id, start_time,advice,summary):
+def perform_llm_analysis(workflow_memory, extra_instructions, site_wide_instructions, run_rerun_path, workflow_instructions, resize_screenshot_result_all_chunks,screenshot_data, run_id, start_time,advice,summary):
     """Performs LLM analysis to generate action plan."""
     #print("Starting vision analysis")
 
-    # Ensure the resized image exists
-    resized_image_path = f'{run_rerun_path}/chunks/resized_chunk_1.png'
-    if not os.path.exists(resized_image_path):
-        print(f"Error: Resized image not found at {resized_image_path}")
-        return None  # Or handle the error appropriately
+
+    resized_image_paths = []
+    for c in resize_screenshot_result_all_chunks.keys():
+        resized_image_path = f'{run_rerun_path}/chunks/resized_{c}'
+        if not os.path.exists(resized_image_path): # Check if the resized image exists
+            print(f"Error: Resized image not found at {resized_image_path}")
+            return None  # Or handle the error appropriately
+        else:
+            resized_image_paths.append(resized_image_path)
+
 
     page_action_json_ranked = analyze_raw_screenshot(
         workflow_memory,
         extra_instructions,
         site_wide_instructions,
-        resized_image_path,
+        resized_image_paths,
         workflow_instructions,
-        dimension_info=resize_screenshot_result,
+        dimension_info=screenshot_data,
+        resize_screenshot_result_all_chunks = resize_screenshot_result_all_chunks,
         run_id=run_id,
         advice=advice,
         summary=summary
     )
     #print(f"Total candidates: {len(page_action_json_ranked.get('action_tasks', []))} with lap time: {time.time()-start_time}, about to perform actions")
     return page_action_json_ranked
-
-import os
 
 import os
 
@@ -1248,7 +1286,7 @@ def get_files_with_extension(directory, extension):
 # print(get_files_with_extension(directory_path, file_extension))
 
 
-def run_metadata_gather(output_path, overlap_percentage=20, max_chunks=None):
+def run_metadata_gather(output_path, overlap_percentage=20, max_chunks=None,wait_after_scroll=500):
     """
     Gather metadata and screenshots by calling the FastAPI server.
 
@@ -1267,7 +1305,7 @@ def run_metadata_gather(output_path, overlap_percentage=20, max_chunks=None):
         # Call the server to take screenshots
         screenshot_response = requests.get(
             f"http://127.0.0.1:8000/screenshot",
-            params={"output_path": output_path, "overlap_percentage": overlap_percentage,"max_chunks": max_chunks, 
+            params={"output_path": output_path, "overlap_percentage": overlap_percentage,"max_chunks": max_chunks, "wait_after_scroll":wait_after_scroll,
                         "action_id": None,
                         "candidate_id": None
                     }
@@ -1282,123 +1320,6 @@ def run_metadata_gather(output_path, overlap_percentage=20, max_chunks=None):
     except Exception as e:
         print(f"Error during metadata gather: {e}")
         raise
-
-# ... (other functions in helper.py) ...
-
-
-# def execute_actions(page_action_json_ranked, wait_time):
-#     """
-#     Execute actions using viewport-space coordinates.
-    
-#     Args:
-#         page_action_json_ranked (dict): The action payload containing tasks and candidates
-#         wait_time (int): Time to wait between actions in milliseconds
-    
-#     Returns:
-#         dict: Response from the action request
-#     """
-#     if page_action_json_ranked and 'action_tasks' in page_action_json_ranked:
-#         modified_payload = copy.deepcopy(page_action_json_ranked)
-        
-        
-#         print("Converting coordinates to viewport space...")
-#         for task in modified_payload['action_tasks']:
-#             for candidate in task.get('candidates', []):
-#                 if 'coordinates' in candidate and candidate['coordinates_ready_to_act'] is not None:
-#                     orig_coords = candidate['coordinates_ready_to_act']
-#                     # Convert coordinates to viewport space
-#                     viewport_x = orig_coords['x'] * x_ratio
-#                     viewport_y = orig_coords['y'] * y_ratio
-                    
-#                     candidate['coordinates_ready_to_act'] = { # Use this for action execution (viewport space)
-#                         'x': viewport_x,
-#                         'y': viewport_y
-#                     }
-#                     print(f"Converted coordinates: {orig_coords} -> {candidate['coordinates_ready_to_act']}")
-                    
-#     response = send_action_request(payload=modified_payload, wait_time=wait_time)
-#     return response
-
-
-# def perform_post_action_analysis(workflow_id, run_id, workflow_step_path_temp, page_action_json_ranked, resize_screenshot_result, start_time, max_chunks=None):
-#     """Performs post-action analysis, including screenshot comparison and LLM evaluation."""
-#     print("Starting re-assessment: metadata gathering w/ window resizing")
-#     url_metadata_temp, screenshot_data_temp = run_metadata_gather(
-#         workflow_name=workflow_step_path_temp, overlap_percentage=20, max_chunks=max_chunks
-#     )
-#     print("Finished metadata gathering with lap time: ", time.time() - start_time)
-
-#     resize_screenshot_result_temp = resize_and_crop(
-#         input_path=f'{workflow_step_path_temp}/chunk_1.png',
-#         output_path=f'{workflow_step_path_temp}/resized_orig.png'
-#     )
-#     copy_and_rename_file(f'{workflow_step_path_temp}/resized_orig.png', f'{workflow_step_path_temp}/resized.png')
-
-#     previous_step_detail = extract_entities_for_evaluation(page_action_json_ranked)
-
-#     print("Starting re-assessment: vision analysis with lap time: ", time.time() - start_time)
-#     eval_json = evaluate_run_screenshots(
-#         workflow_memory=workflow_memory,
-#         site_wide_instructions=site_wide_instructions,
-#         workflow_step_path=workflow_step_path,
-#         workflow_step_path_temp=workflow_step_path_temp,
-#         dimension_info=[resize_screenshot_result, resize_screenshot_result_temp],
-#         previous_step_detail=previous_step_detail,
-#         summary=workflow_memory['summary']
-#     )
-#     print("Finished re-assessment with lap time: ", time.time() - start_time)
-#     return eval_json, url_metadata_temp, screenshot_data_temp, resize_screenshot_result_temp
-
-# def handle_revert(run_id, previous_workflow_step_path, workflow_step_path,max_chunks):
-#     """Handles reverting to the previous step."""
-#     print("LLM detected no meaningful change. Considering reverting to the previous step.")
-#     if run_id > 0:
-#         url_metadata, screenshot_data = run_metadata_gather(
-#             workflow_name=workflow_step_path, overlap_percentage=20, max_chunks=max_chunks
-#         )
-#         resize_screenshot_result = resize_and_crop(
-#             input_path=f'{workflow_step_path}/chunk_1.png',
-#             output_path=f'{workflow_step_path}/resized_orig.png'
-#         )
-#         copy_and_rename_file(f'{workflow_step_path}/resized_orig.png', f'{workflow_step_path}/resized.png')
-
-#         advice = "Reverted to the previous step due to no meaningful change detected.\n"
-#         return True, advice, workflow_step_path, url_metadata, screenshot_data, resize_screenshot_result
-#     else:
-#         print("No previous step to revert to.")
-#         return False, "", None, None, None, None
-
-# def update_workflow_memory(workflow_memory, eval_json, can_continue, any_actions_succeeded, run_id, advice):
-#     """Updates the workflow memory based on evaluation results."""
-#     if eval_json['overall_success'] == False:
-#         if eval_json['can_continue'] == True:
-#             actions_succeeded = 0
-#             for a in eval_json['action_tasks']:
-#                 candidate_succeeded = False
-#                 for c in a['candidates']:
-#                     candidate_filtered = get_action_and_candidate(
-#                         page_action_json_ranked, action_id=a['action_id'], candidate_id=c['candidate_id']
-#                     )
-#                     if candidate_filtered:
-#                         if c['success'] == True:
-#                             candidate_succeeded = True
-#                             any_actions_succeeded = True
-#                             actions_succeeded += 1
-#                         elif candidate_filtered['candidate']['to_act'] == False and candidate_succeeded == False:
-#                             advice += f"- In the previous run this step failed, but this task candidate wasn't run and perhaps should have, task '{candidate_filtered['candidate']['element_description']}' was never run, so consider the following next for your next step.': {c['advice']}\n"
-#                         elif candidate_filtered['candidate']['to_act'] == True:
-#                             advice += f"- In the previous run, task '{candidate_filtered['candidate']['element_description']}' failed. Consider the following next for your next step.': {c['advice']}\n"
-#                     else:
-#                         advice += f"- In the previous run, action {a['action_id']} failed. Consider the following next for your next step.': {c['advice']}\n"
-#         elif eval_json['can_continue'] == False:
-#             # Preserve advice for the next full retry:
-#             workflow_memory['previous_state_advice'] += f"This workflow was tried before and failed. Consider this advice on what to do differently perhaps: " + eval_json['advice_if_redo_is_necessary'] + "\n"
-#             advice = ""  # Reset run-specific advice
-
-#     elif eval_json['overall_success'] == True:
-#         workflow_memory['summary'] = eval_json['summary']
-
-#     return workflow_memory, advice
 
 def reset_workflow(workflow_id, workflow_instructions, extra_instructions):
     workflow_memory = {}
@@ -1546,6 +1467,7 @@ def test_coordinate_consistency(page_action_json_ranked, workflow_step_path, res
                         if bbox:
                             results[-1]['bounding_box'] = bbox
                 except Exception as e:
+                    print(f"Error fetching metadata: {e}")
                     results[-1]['metadata_error'] = str(e)
 
                 # Test drawing a dot in browser at these coordinates
@@ -1556,6 +1478,7 @@ def test_coordinate_consistency(page_action_json_ranked, workflow_step_path, res
                     )
                     results[-1]['dot_draw_result'] = dot_response.json()
                 except Exception as e:
+                    print(f"Error drawing dot: {e}")
                     results[-1]['dot_error'] = str(e)
                 
     # Save results
