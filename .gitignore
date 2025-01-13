@@ -174,4 +174,5 @@ cython_debug/
 # Example .gitignore content
 keys.py
 token.json
+clients/
 >>>>>>> 253cdfc (Initial commit)

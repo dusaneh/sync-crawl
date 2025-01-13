@@ -18,13 +18,14 @@ class LogOverwriteError(Exception):
     pass
 
 class HierarchicalLogger:
-    def __init__(self, json_file_path="hierarchical_log.json", base_folder_path="./"):
+    def __init__(self, client_folder=None):
         """
         Initialize the logger with an optional JSON file path and base folder path.
         If the file exists, load the data from it.
         """
-        self.json_file_path = Path(json_file_path)
-        self.base_folder_path = Path(base_folder_path)
+        self.client_folder = client_folder
+        self.json_file_path = Path(client_folder+'/logger.json')
+        self.base_folder_path = Path("./")
         
         # Try to load existing data from JSON file
         if self.json_file_path.exists():
@@ -67,7 +68,7 @@ class HierarchicalLogger:
         Build the folder path based on provided IDs.
         Returns a Path object for the constructed path.
         """
-        parts = []
+        parts = [self.client_folder]
         if workflow_id is not None:
             parts.append(str(workflow_id))
             if sample_id is not None:
