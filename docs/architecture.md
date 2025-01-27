@@ -1,185 +1,156 @@
 # Architecture Overview
 
-## System Components
+## Core Components
 
 ```mermaid
 graph TD
-    A[Jupyter Notebook] --> B[FastAPI Server]
-    B --> C[Playwright Browser]
-    B --> D[Claude AI]
-    B --> E[File System]
-    F[Helper Functions] --> B
-    G[Logging System] --> E
+    N[Jupyter Notebook/crawl.ipynb] --> H[Helper Functions/helper.py]
+    N --> L[Logger/hlogger.py]
+    H --> C[Claude AI]
+    H --> F[FastAPI Server]
+    F --> B[Playwright Browser]
+    N --> F
+    L --> FS[File System]
+    H --> FS
+    N --> FS
 ```
 
 ### Component Descriptions
 
 1. **Jupyter Notebook (`crawl.ipynb`)**
-   - Entry point for workflow execution
-   - Manages workflow state and progression
-   - Coordinates between components
-   - Handles high-level error recovery
+   - Primary control center and orchestrator
+   - Manages entire workflow execution
+   - Coordinates all other components
+   - Handles high-level workflow decisions
+   - Interacts with FastAPI server for browser control
+   - Uses helper functions for analysis
+   - Uses logger for state tracking
+   - Directly manages file system operations
 
-2. **FastAPI Server (`fastAPIServ.py`)**
-   - Browser automation coordination
-   - Screenshot management
-   - Element interaction
-   - State validation
-   - API endpoints for system control
+2. **Helper Functions (`helper.py`)**
+   - Primary interface to Claude AI
+   - Handles image analysis and processing
+   - Contains core decision-making logic
+   - Manages coordinate calculations
+   - Provides utility functions for notebook
+   - Interacts with file system for image handling
+   - Makes requests to FastAPI server as needed
 
-3. **Helper Functions (`helper.py`)**
-   - AI integration
-   - Image processing
-   - Coordinate calculation
-   - File management
-   - Analysis utilities
+3. **Logging System (`hlogger.py`)**
+   - Provides hierarchical logging structure
+   - Manages state persistence
+   - Handles process documentation
+   - Controls file system organization
+   - Used by all components for tracking
 
-4. **Logging System (`hlogger.py`)**
-   - Hierarchical data structure
-   - Process documentation
-   - State tracking
-   - Error logging
+4. **FastAPI Server (`fastAPIServ.py`)**
+   - Manages Playwright browser instance
+   - Handles browser automation tasks
+   - Takes screenshots
+   - Executes UI interactions
+   - Controlled by notebook and helper functions
 
 ## Data Flow
 
-### 1. Workflow Initialization
+### 1. Main Workflow Flow
 ```mermaid
 sequenceDiagram
-    participant N as Notebook
-    participant S as Server
-    participant B as Browser
+    participant NB as Notebook
+    participant H as Helper
+    participant L as Logger
+    participant F as FastAPI
+    participant C as Claude AI
     
-    N->>S: Initialize workflow
-    S->>B: Connect to browser
-    B-->>S: Connection established
-    S-->>N: Ready status
-```
-
-### 2. Action Execution
-```mermaid
-sequenceDiagram
-    participant N as Notebook
-    participant S as Server
-    participant AI as Claude AI
-    participant B as Browser
-    
-    N->>S: Request screenshot
-    S->>B: Capture page state
-    B-->>S: Screenshot data
-    S->>AI: Analyze UI elements
-    AI-->>S: Action recommendations
-    S->>B: Execute actions
-    B-->>S: Action results
-    S-->>N: Update status
+    NB->>L: Initialize logging
+    NB->>F: Start browser session
+    loop Workflow Steps
+        NB->>F: Request screenshot
+        F-->>NB: Screenshot data
+        NB->>H: Request analysis
+        H->>C: Send for AI analysis
+        C-->>H: Analysis results
+        H-->>NB: Action recommendations
+        NB->>L: Log state
+        NB->>F: Execute actions
+        F-->>NB: Action results
+    end
 ```
 
 ## Folder Structure
 
 ```
 sync-crawl/
-├── clients/
-│   └── [client_name]/
-│       └── [workflow_id]/
-│           └── [sample_id]/
-│               └── [rerun_id]/
-│                   └── [run_id]/
-│                       └── [run_retry_id]/
-│                           ├── dots/
-│                           ├── temp/
-│                           ├── highlights/
-│                           └── chunks/
-├── docs/
-├── .venv/
-├── crawl.ipynb
-├── fastAPIServ.py
-├── helper.py
-├── hlogger.py
-├── log_config.py
-├── requirements.txt
-└── README.md
+├── clients/                   # Managed by Logger
+│   └── [client_name]/        # Client-specific data
+│       └── [workflow_id]/    # Workflow instances
+│           └── [sample_id]/  # Execution samples
+├── crawl.ipynb               # Main control notebook
+├── fastAPIServ.py           # Browser automation server
+├── helper.py                # AI and analysis functions
+├── hlogger.py              # Logging system
+└── log_config.py           # Logging configuration
 ```
 
 ## Key Processes
 
-### 1. UI Analysis
-- Screenshot capture
-- Element detection
-- Coordinate mapping
-- Visual validation
+### 1. Workflow Execution
+1. Notebook initializes workflow
+2. Logger creates folder structure
+3. Helper prepares for analysis
+4. FastAPI server starts browser session
+5. Workflow steps execute through notebook
 
-### 2. Action Planning
-- Context analysis
-- Element prioritization
-- Action sequencing
-- Validation rules
+### 2. Analysis Process
+1. Notebook requests screenshot via FastAPI
+2. Helper receives screenshot for analysis
+3. Helper sends to Claude AI
+4. Claude AI returns analysis
+5. Helper processes results
+6. Notebook receives action recommendations
 
-### 3. Execution
-- Browser manipulation
-- State verification
-- Error handling
-- Result logging
-
-### 4. Documentation
-- Process tracking
-- State recording
-- Error documentation
-- Result analysis
+### 3. Logging Process
+1. Logger creates hierarchical structure
+2. Components send logs to logger
+3. Logger manages state persistence
+4. Logger organizes artifacts
+5. Logger maintains process documentation
 
 ## System States
 
 1. **Initialization**
-   - Browser connection
-   - Server startup
-   - Resource verification
+   - Notebook starts workflow
+   - Logger creates structure
+   - FastAPI connects to browser
+   - Helper prepares for analysis
 
-2. **Active Crawling**
-   - Element analysis
-   - Action execution
-   - State tracking
+2. **Execution**
+   - Notebook orchestrates flow
+   - Helper performs analysis
+   - FastAPI executes actions
+   - Logger tracks state
 
 3. **Error Recovery**
-   - State rollback
-   - Alternative path selection
-   - Error documentation
-
-4. **Completion**
-   - Goal verification
-   - Resource cleanup
-   - Documentation finalization
-
-## Interactions with External Systems
-
-### 1. Browser
-- Chrome debugging protocol
-- Playwright automation
-- Screenshot capture
-- DOM manipulation
-
-### 2. AI Services
-- Claude API integration
-- Image analysis
-- Decision making
-- Action validation
-
-### 3. File System
-- Screenshot storage
-- Log management
-- State persistence
-- Documentation generation
+   - Notebook manages recovery
+   - Helper analyzes failure
+   - Logger maintains state
+   - FastAPI resets browser if needed
 
 ## Performance Considerations
 
 1. **Resource Management**
-   - Memory usage monitoring
-   - Browser instance control
-   - File system optimization
+   - Notebook controls execution flow
+   - Helper manages AI requests
+   - FastAPI handles browser resources
+   - Logger optimizes file operations
 
 2. **Error Handling**
-   - Graceful degradation
-   - State recovery
-   - Process continuation
+   - Notebook provides high-level recovery
+   - Helper validates analysis
+   - FastAPI manages browser stability
+   - Logger ensures state consistency
 
-3. **Scalability**
-   - Parallel workflow support
-   - Resource isolation
-   - Load management
+3. **State Management**
+   - Notebook tracks workflow progress
+   - Helper maintains analysis context
+   - Logger persists system state
+   - FastAPI maintains browser state
