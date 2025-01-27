@@ -13,6 +13,12 @@ import anthropic
 import shutil
 import keys
 import time
+from anthropic import Anthropic
+from log_config import get_logger
+
+logger = get_logger(__name__)  # Use module name for easier identification
+
+
 
 
 ###########################################
@@ -41,22 +47,96 @@ for to in TYPES_OF_OCR:
         weights_mod[modified_type] = WEIGHTS[to]
         ob += 1
 
+
+import copy
+import math
+
+# Function to calculate the area of a rectangle given it's dimensions (height and width) and the number of tokens
+# that can be used to describe the image. The area of the rectangle should be greater than or equal to the number of tokens.
+def largest_height_given_width(max_tokens,orig_width,suggested_height=None):
+    """
+    Returns the smallest integer dimensions (height, width) that preserve
+    the original aspect ratio and ensure:
+        (new_width * new_height) >= 1,200,000
+
+    If the original image is already >= 1,200,000 in area, returns the
+    original dimensions unchanged.
+
+    """
+    not_found = True
+    adjusted_width = copy.deepcopy(orig_width)
+    if suggested_height:
+        adjusted_height = suggested_height
+    else:
+        adjusted_height = copy.deepcopy(orig_width)
+
+
+
+    while not_found:
+
+        test_tokens = adjusted_height * adjusted_width / 750
+
+        adjusted_height_down = adjusted_height - 1
+        adjusted_height_up = adjusted_height + 1
+
+        test_tokens_up = adjusted_height_up * adjusted_width / 750
+
+        if test_tokens_up < max_tokens:
+            adjusted_height = adjusted_height_up
+        elif test_tokens< max_tokens:
+            not_found = False
+        else:
+            adjusted_height = adjusted_height_down
+
+
+
+
+    
+    return adjusted_height, test_tokens
+
+def smallest_dimensions_meeting_area(orig_height, orig_width):
+    """
+    Returns the smallest integer dimensions (height, width) that preserve
+    the original aspect ratio and ensure:
+        (new_width * new_height) >= 1,200,000
+
+    If the original image is already >= 1,200,000 in area, returns the
+    original dimensions unchanged.
+
+    """
+    not_found = True
+    adjusted_height = copy.deepcopy(orig_height)
+    adjusted_width = copy.deepcopy(orig_width)
+
+    aspect_ratio = adjusted_height / adjusted_width
+    tokens = 0
+
+    while not_found:
+
+        tokens = adjusted_height * adjusted_width / 750
+
+        if tokens < 1600:
+            not_found = False
+        else:
+            adjusted_height = adjusted_height - 1
+            # round down adjusted width after maintaining aspect ratio
+            adjusted_width = math.floor(adjusted_height / aspect_ratio)
+
+
+    
+    return adjusted_height, adjusted_width,tokens,aspect_ratio
+
+
 #     return prompt
 def resize_and_crop(input_path, output_path, x=None, y=None, padding=0):
+    max_width, max_height = 1092, 1092 # for cropping only
     # Open the original image
     image = Image.open(input_path)
     original_width, original_height = image.size
+    #print(original_height, original_width)
 
-    # Resize the image, maintaining the aspect ratio, with a max dimension of 951x1268 pixels
-    max_width, max_height = 1092, 1092
-    aspect_ratio = original_width / original_height
+    new_height, new_width,tokens,aspect_ratio = smallest_dimensions_meeting_area(original_height, original_width)
 
-    if aspect_ratio > (max_width / max_height):
-        new_width = min(max_width, original_width)
-        new_height = int(new_width / aspect_ratio)
-    else:
-        new_height = min(max_height, original_height)
-        new_width = int(new_height * aspect_ratio)
 
     resized_image = image.resize((new_width, new_height), Image.LANCZOS)
 
@@ -222,7 +302,7 @@ def extract_entities_for_evaluation(payload):
     return extracted_data
 
 
-def get_eval_prompt(workflow_memory, extra_instructions=None, site_wide_instructions=None, dimension_info=None,previous_step_detail=None,summary=None):
+def get_eval_prompt(workflow_instructions, extra_instructions=None, site_wide_instructions=None,site_description=None, dimension_info=None,previous_step_detail=None,summary=None):
     prompt = f"""
 
 You are part of a system that automates the exploration and documentation of web application workflows by analyzing UI states and interactions. Your role is to assist in navigating through product features by identifying and evaluating UI elements and their interactions, following standard user paths as designed in the product. Each workflow you analyze will be used to create customer support documentation, so you must prioritize generic, widely-applicable interactions that match the product's intended functionality, avoiding user-specific data or shortcuts. Your analysis should focus on actions that would be clear and repeatable in support documentation. When evaluating UI states and suggesting actions, consider how these steps would be documented for support agents and end users - they must follow standard navigation patterns and represent how the product is meant to be used. The goal is to build verified, standardized workflow guides that support agents can confidently share with customers. Don't use shortcuts or links available which don't appear to be perscriptive by web designers and seem temporary or a part of some recommendation system which could vary user by user.
@@ -235,9 +315,11 @@ Your task in particular, as a subsystem, is to evaluate the actions taken by the
     Images: Two or three screenshots of a webpage with width Image 1 representing the screenshot before last set of actions were taken, Image 2 containing the actions attempted described as blue dots overlayed over the first image, and Image 3 representing the screenshot after the last actions were taken.
     Evaluate: evaluate the success of each action and candidate, and provide advice for the next steps both 1) in terms of what other elements should have been hit and 2) describe a more percise location to click by analyzing the intended target, blue dot locations and coordinates used. The context of the evaluation is a site crawler trying to accomplish a workflow to gather product knowledge. Only the top ranked candidate actions will be attempted (where 'to_act' is True), but consider if alternate actions (where 'to_act' is False) would have been better and comment in the advice section.
 
-    Crawl Instructions: {workflow_memory['workflow_instructions']}
+    Crawl Instructions: {workflow_instructions}
     """
 
+    if site_description:
+        prompt += f"\nHere is the website you are on: {site_description}"
     if site_wide_instructions:
         prompt += f"\nHere is general info on the product your are evaluating: {site_wide_instructions}"
 
@@ -375,12 +457,12 @@ def copy_and_rename_file(old_path, new_path,delete_original=True):
     """
     # Check if source file exists
     if not os.path.isfile(old_path):
-        print(f"Source file does not exist: {old_path}")
+        logger.error(f"Source file does not exist: {old_path}")
         return
 
     # Check if destination file already exists
     if os.path.isfile(new_path):
-        print(f"Destination file already exists: {new_path} from {old_path}")
+        logger.warning(f"Destination file already exists: {new_path}")
         return
 
     try:
@@ -393,16 +475,12 @@ def copy_and_rename_file(old_path, new_path,delete_original=True):
             os.remove(old_path)
         #print(f"Original file deleted: {old_path}")
     except Exception as e:
-        print(f"Error copying file: {e}")
+        logger.error(f"Error copying file: {e}")
 
 
-def get_page_action_prompt(workflow_instructions, workflow_memory, extra_instructions=None, site_wide_instructions=None, dimension_info=None):
+def get_page_action_prompt(workflow_instructions, extra_instructions=None, site_wide_instructions=None,site_description = None, best_image=None,summary = None,advice = None):
     
-    dims = ''
-    i = 1
-    for c in dimension_info['chunks']:
-        dims += f"Image: {i} has a width of {c['dimensions']['width']} and a height of {c['dimensions']['height']}\n"
-        i += 1
+    dims = f"Image: has a width of {best_image['resized_dimensions']['width']} and a height of {best_image['resized_dimensions']['height']}\n"
     
     prompt = f"""
 
@@ -413,7 +491,8 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
     Instructions:
 
     Given:
-    Image: Given {len(dimension_info['chunks'])} screenshot(s) of a webpage with the following dimensions:
+    Image: Given the screenshot of a webpage with the following dimensions. Use this information when calculating the cooringates of elements on the image.
+
     {dims}
 
     -Your task is to analyze the next steps required to accomplish the given page action based ONLY on what you can observe in the screenshot, considering any prior action history. 
@@ -466,11 +545,13 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
     Page Action: {workflow_instructions}
     """
 
+    if site_description:
+        prompt += f"\nHere is the website your are evaluating: {site_description}"
     if site_wide_instructions:
         prompt += f"\nHere is general info on the product your are evaluating: {site_wide_instructions}"
 
     if extra_instructions:
-        prompt += f"\nAdditional instructions specific to this page: {extra_instructions}"
+        prompt += f"\nAdditional instructions specific to this page or action summary of the workflow so far: {extra_instructions}"
 
     prompt += """
     Output Format:
@@ -488,13 +569,13 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
                 "description": "string",  // Description of this sequential step
                 "candidates": [  // List of alternative ways to accomplish THIS SPECIFIC step
                     {
-                        "element_description": "string",  // Detailed visual description of the element including location
+                        "image_description":"string",  // Detailed description of the image where the image is located
+                        "element_description": "string",  // Detailed visual description of the element and must also include description of location of the element relative to the image boundaries and compared with other elements within the screenshot
                         "action": "string",  // Action type (Only: "click", "type", or "keyboard_action")
                         "type_text": "string",  // Text string to type if action is "type"
                         "expected_outcome": "string",  // Expected outcome after this specific action
                         "keyboard_action": "string",  // Keyboard action if applicable: "Enter", "Backspace", "Delete", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Tab", "Escape"
-                        "image_number": int,  // (1-"""+str(len(dimension_info['chunks']))+""") Represents the image number which best represents where the element is located (it could be represented in multiple screenshots, but pick the one where it's most visible)
-                        "coordinates": {  // Location of the element within the given image (see image dimensions above for reference when creating coordinates)
+                        "coordinates": {  // Location of the element within the given image (see image dimensions above for reference when creating coordinates).
                             "x": int,
                             "y": int
                         }
@@ -511,8 +592,11 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
     "Enter", "Backspace", "Delete", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Tab", "Escape"
     """
 
-    if workflow_memory:
-        prompt += f"\nAction History (steps already taken which shouldn't be repeated): {workflow_memory}"
+    if len(summary) > 0:
+        prompt += f"\nAction History (steps already taken which shouldn't be repeated): {summary}\n\n"
+
+    if len(advice) > 0:
+        prompt += advice
 
     return prompt
 
@@ -606,12 +690,10 @@ def parse_json_response(response_text):
         return parsed_dict
 
     except json.JSONDecodeError as e:
-        print("Raw input:\n", response_text)
-        print(f"Error parsing JSON response: {e}")
+        logger.error(f"Error parsing JSON response: {e}. LLM API response is {response_text}")
         return {"error": "Failed to parse the response"}
     except Exception as e:
-        print("Raw input:\n", response_text)
-        print(f"Unexpected error during parsing: {e}")
+        logger.error(f"Unexpected error during parsing: {e}. LLM API response is {response_text}")
         return {"error": "Unexpected error occurred during parsing"}
 
 
@@ -651,64 +733,86 @@ model_unstruct = genai.GenerativeModel(
 )
 
 
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
+from anthropic import Anthropic
 
-def claude_run(screenshot_path, prompt,model,temperature=0.0):
+def claude_run(screenshot_path, prompt, model, temperature=0.0):
+    def _run_claude():
+        try:
+            client = anthropic.Anthropic(api_key=claude_key)
+            
+            # Create a list to store the encoded images
+            decoded_images = []
 
-    ###########################################
+            # Process each image in the images list
+            logger.info(f"Processing {len(screenshot_path)} images")
+            i=1
+            for image_path in screenshot_path:
+                logger.info(f"Processing image {image_path} ~{os.path.getsize(image_path)/1000}KB")
+                if os.path.getsize(image_path)> 1000000: # 
+                    logger.error(f"Image {image_path} is ~{os.path.getsize(image_path)/1000}KB. It is too large to process.")
+                else:
+                    try:
+                        with open(image_path, "rb") as image_file:
+                            image_base64 = base64.b64encode(image_file.read()).decode('utf-8')
 
+                            decoded_images.append({
+                                "type": "text",
+                                "text": f"Image {i}:"
+                            })
 
-    client = anthropic.Anthropic(
-        # defaults to os.environ.get("ANTHROPIC_API_KEY")
-        api_key=claude_key,
-    )
+                            decoded_images.append({
+                                "type": "image",
+                                "source": {
+                                    "type": "base64",
+                                    "media_type": "image/png",
+                                    "data": image_base64,
+                                },
+                            })
+                        i+=1
+                    except Exception as e:
+                        raise Exception(f"Error processing image {image_path}: {str(e)}")
 
-    # Create a list to store the encoded images
-    decoded_images = []
-
-    # Process each image in the images list
-    i=1
-    for image_path in screenshot_path:
-        with open(image_path, "rb") as image_file:
-            image_base64 = base64.b64encode(image_file.read()).decode('utf-8')
-
-            decoded_images.append({
+            logger.info(f"Finished processing images")
+            # Prepare the message content
+            message_content = decoded_images + [
+                {
                     "type": "text",
-                    "text": f"Image {i}:"
-                })
+                    "text": prompt
+                }
+            ]
 
-            decoded_images.append({
-                "type": "image",
-                "source": {
-                    "type": "base64",
-                    "media_type": "image/png",
-                    "data": image_base64,
-                },
-            })
-        i+=1
+            # Send the message to Claude
+            message = client.messages.create(
+                model=model,
+                temperature=temperature,
+                max_tokens=8192,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": message_content,
+                    }
+                ],
+            )
 
-    # Prepare the message content
-    message_content = decoded_images + [
-        {
-            "type": "text",
-            "text": prompt
-        }
-    ]
+            return message.content[0].text, message
 
+        except Exception as e:
+            if "api" in str(e).lower():
+                raise Exception(f"Anthropic API error: {str(e)}")
+            else:
+                raise Exception(f"Unexpected error: {str(e)}")
 
-    # Send the message to Claude
-    message = client.messages.create(
-        model=model,
-        temperature=temperature,
-        max_tokens=4024,
-        messages=[
-            {
-                "role": "user",
-                "content": message_content,
-            }
-        ],
-    )
-
-    return message.content[0].text#parse_json_response(message.content[0].text)
+    # Run with timeout
+    with ThreadPoolExecutor() as executor:
+        future = executor.submit(_run_claude)
+        try:
+            return future.result(timeout=30)  # 30 seconds timeout
+        except concurrent.futures.TimeoutError:
+            raise Exception("Request timed out after 30 seconds")
+        except Exception as e:
+            raise e
 
 def analyze_page_actions(screenshot_path, prompt,api):
     """Analyzes the next steps required to accomplish the given page_action on a screenshot."""
@@ -724,16 +828,26 @@ def analyze_page_actions(screenshot_path, prompt,api):
         send_to_generate = [prompt] + files
 
         #print(send_to_generate)
-        response = model.generate_content(send_to_generate)
+        raw = model.generate_content(send_to_generate)
 
-        response= response.text
+        response_text= raw.text
 
     elif api == "claude":
-        response = claude_run(screenshot_path, prompt = prompt,model="claude-3-5-sonnet-20241022")
+        
+        logger.info(f"Sending to Claude LLM API")
+
+
+        try:
+            response_text,raw = claude_run(screenshot_path, prompt = prompt,model="claude-3-5-sonnet-20241022")
+            logger.info(f"Completed Claude LLM API call")
+        except Exception as e:
+            print(f"Error occurred: {str(e)}")
+            logger.error(f"Error occurred: {str(e)}")
+        
     
     #print("LLM OUT:",response)
-    response_json = parse_json_response(response)
-    return response_json
+    response_json = parse_json_response(response_text)
+    return response_json,raw
 
 
 
@@ -743,114 +857,69 @@ def analyze_page_actions(screenshot_path, prompt,api):
 #     return response.text
 
 
-def dict_json(data=None, file_path=None, action="save"):
-    """
-    Saves a dictionary to a file or loads a dictionary from a file in JSON format.
+# def dict_json(data=None, file_path=None, action="save"):
+#     """
+#     Saves a dictionary to a file or loads a dictionary from a file in JSON format.
     
-    Args:
-        data (dict, optional): The dictionary to save. Required for 'save' action.
-        file_path (str): The file path where the dictionary should be saved/loaded.
-        action (str): Action to perform - either "save" or "load". Default is "save".
+#     Args:
+#         data (dict, optional): The dictionary to save. Required for 'save' action.
+#         file_path (str): The file path where the dictionary should be saved/loaded.
+#         action (str): Action to perform - either "save" or "load". Default is "save".
     
-    Returns:
-        dict: Loaded dictionary if action is 'load', None if action is 'save'.
-    """
-    try:
-        if action == "save":
-            if data is None or file_path is None:
-                raise ValueError("Data and file path must be provided for saving.")
-            # Open the file in write mode and serialize the dictionary to JSON with UTF-8 encoding
-            with open(file_path, 'w', encoding='utf-8') as file:
-                json.dump(data, file, indent=4, ensure_ascii=False)
-            #print(f"Dictionary saved successfully to {file_path}")
+#     Returns:
+#         dict: Loaded dictionary if action is 'load', None if action is 'save'.
+#     """
+#     try:
+#         if action == "save":
+#             if data is None or file_path is None:
+#                 raise ValueError("Data and file path must be provided for saving.")
+#             # Open the file in write mode and serialize the dictionary to JSON with UTF-8 encoding
+#             with open(file_path, 'w', encoding='utf-8') as file:
+#                 json.dump(data, file, indent=4, ensure_ascii=False)
+#             #print(f"Dictionary saved successfully to {file_path}")
         
-        elif action == "load":
-            if file_path is None:
-                raise ValueError("File path must be provided for loading.")
+#         elif action == "load":
+#             if file_path is None:
+#                 raise ValueError("File path must be provided for loading.")
             
-            # Open the file in binary mode first to check content
-            with open(file_path, 'rb') as file:
-                first_byte = file.read(1)
-                # Check if the file is likely a text-based JSON file by inspecting the first byte
-                if first_byte in [b'{', b'[']:
-                    file.seek(0)
-                    # Open the file again in text mode for JSON loading
-                    with open(file_path, 'r', encoding='utf-8') as text_file:
-                        data = json.load(text_file)
-                    #print(f"Dictionary loaded successfully from {file_path}")
-                    return data
-                else:
-                    raise ValueError("File does not appear to be a valid JSON file. It might be binary or another format.")
+#             # Open the file in binary mode first to check content
+#             with open(file_path, 'rb') as file:
+#                 first_byte = file.read(1)
+#                 # Check if the file is likely a text-based JSON file by inspecting the first byte
+#                 if first_byte in [b'{', b'[']:
+#                     file.seek(0)
+#                     # Open the file again in text mode for JSON loading
+#                     with open(file_path, 'r', encoding='utf-8') as text_file:
+#                         data = json.load(text_file)
+#                     #print(f"Dictionary loaded successfully from {file_path}")
+#                     return data
+#                 else:
+#                     raise ValueError("File does not appear to be a valid JSON file. It might be binary or another format.")
 
-        else:
-            raise ValueError("Action must be either 'save' or 'load'.")
+#         else:
+#             raise ValueError("Action must be either 'save' or 'load'.")
     
-    except (json.JSONDecodeError, ValueError, UnicodeDecodeError) as e:
-        print(f"Error loading JSON file: {e}")
-        return None
-
-
-
-
-def save_or_load_pickle(filepath, data=None, mode='save'):
-    """Saves or loads a dictionary to/from a pickle file.
-
-    Args:
-        filepath: The path to the pickle file.
-        data: The dictionary to save (if mode is 'save').
-        mode: 'save' to save the dictionary, 'load' to load it.
-
-    Returns:
-        The loaded dictionary if mode is 'load', otherwise None.
-        Raises an exception if an error occurs during saving or loading.
-    """
-    if mode == 'save':
-        if data is None:
-            raise ValueError("Data must be provided when saving.")
-        
-        # Create directories only if there is a directory path
-        directory = os.path.dirname(filepath)
-        if directory:
-            os.makedirs(directory, exist_ok=True)
-
-        with open(filepath, 'wb') as f:
-            pickle.dump(data, f)
-        return None
-
-    elif mode == 'load':
-        if not os.path.exists(filepath):
-            raise FileNotFoundError(f"File not found: {filepath}")
-        try:
-            with open(filepath, 'rb') as f:
-                loaded_data = pickle.load(f)
-                return loaded_data
-        except (pickle.UnpicklingError, EOFError) as e: # Handle potential pickle loading errors
-            print(f"Error loading pickle file: {e}")
-            raise Exception(f"Error loading pickle file: {e}") # Re-raise with a more informative message
-
-    else:
-        print(f"Invalid mode. Must be 'save' or 'load'.")
-        raise ValueError("Invalid mode. Must be 'save' or 'load'.")
-
-
+#     except (json.JSONDecodeError, ValueError, UnicodeDecodeError) as e:
+#         print(f"Error loading JSON file: {e}")
+#         return None
 
 
 
 
 if sys.platform == "darwin":
-    # It's a Mac
-    print("Running on macOS")
+    
+    logger.info(f"Running on macOS")
     wdir_path = '/Users/dbosnjakovic/Desktop/python_projects/crawl'
     venv_folder = 'crawl/bin/python'
     curr_v = ''
 elif sys.platform == "win32":
+    logger.info(f"Running on Windows")
     # It's a Windows PC
     wdir_path = 'C:/Users/dusan/OneDrive/Desktop/pp/test/crawl'
     venv_folder = '.venv/Scripts/python.exe'
     curr_v = 'v6/'
-    #print("Running on Windows")
 else:
-    print("Running on", sys.platform)
+    logger.warning(f"Unsupported OS:{sys.platform}")
 
 
 
@@ -884,54 +953,52 @@ def resize_browser_window(width: int, height: int) -> dict:
 #     print(result)
 
 
-
-
-def evaluate_run_screenshots(workflow_memory, site_wide_instructions, run_rerun_path,dimension_info, previous_step_detail, summary, start_time=None):
+def evaluate_run_screenshots(workflow_instructions, site_wide_instructions,site_description, run_rerun_path,dimension_info, previous_step_detail, summary, start_time=None):
     extra_instructions = ''
-    action_prompt = get_eval_prompt(workflow_memory, extra_instructions=extra_instructions, site_wide_instructions=site_wide_instructions, dimension_info=dimension_info, previous_step_detail=previous_step_detail, summary=summary)
-    eval_json = analyze_page_actions(screenshot_path=[f'{run_rerun_path}/chunks/resized_chunk_1.png', f'{run_rerun_path}/dots/resized_chunk_1.png', f'{run_rerun_path}/temp/resized_chunk_1.png'], prompt=action_prompt, api='claude')
+    action_prompt = get_eval_prompt(workflow_instructions, extra_instructions=extra_instructions, site_wide_instructions=site_wide_instructions,site_description = site_description, dimension_info=dimension_info, previous_step_detail=previous_step_detail, summary=summary)
+    eval_json,raw = analyze_page_actions(screenshot_path=[f'{run_rerun_path}/chunks/resized_chunk_{dimension_info[0]['id']}.png', f'{run_rerun_path}/dots/resized_final_screenshot.png', f'{run_rerun_path}/temp/resized_chunk_{dimension_info[1]['id']}.png'], prompt=action_prompt, api='claude')
 
     return eval_json
 
 
 # Function to analyze raw screenshot
-def analyze_raw_screenshot(workflow_memory, extra_instructions, site_wide_instructions, resized_image_paths, workflow_instructions, dimension_info, resize_screenshot_result_all_chunks,run_id,advice,summary):
-    if len(advice)+len(summary) > 0:
-        extra_instructions = f"{summary} /n{advice}"
-        #print(f"Advice applied: {advice}")
-    else:
-        extra_instructions = ''
-        #print("No advice applied")
+def analyze_raw_screenshot(extra_instructions, site_wide_instructions,site_description, resized_image_path, workflow_instructions, best_image,run_id,advice,summary):
         
 
-    action_prompt = get_page_action_prompt(workflow_instructions, workflow_memory, extra_instructions=extra_instructions, site_wide_instructions=site_wide_instructions, dimension_info=dimension_info)
+    action_prompt = get_page_action_prompt(workflow_instructions, extra_instructions=extra_instructions, site_wide_instructions=site_wide_instructions,site_description=site_description, best_image=best_image,summary=summary,advice = advice)
 
     #print(f"PROMPT for runID {run_id}: ",action_prompt)
 
-    page_action_json_all = analyze_page_actions(screenshot_path=resized_image_paths, prompt=action_prompt, api='claude')
+    page_action_json_all,raw = analyze_page_actions(screenshot_path=[resized_image_path], prompt=action_prompt, api='claude')
+    #print("Prefilter:",page_action_json_all)
 
     try:
-        page_action_json_ranked = filter_and_rank_outcome(page_action_json_all, dimension_info,resize_screenshot_result_all_chunks)
-        return page_action_json_ranked
+        page_action_json_ranked = filter_and_rank_outcome(page_action_json_all,best_image)
+        
+        #print("Postfilter:",page_action_json_all)
+        return page_action_json_ranked,action_prompt,page_action_json_all
     except Exception as e:
-        print(f"Error in filter_and_rank_outcome: {e}")
-        return page_action_json_all
+        logger.info(f"Error in filter_and_rank_outcome: {e}")
+        return page_action_json_all,action_prompt,page_action_json_all
 
 import requests
 
 # ... other functions in helper.py ...
 
 # helper.py
-def filter_and_rank_outcome(data, dimension_info,resize_screenshot_result_all_chunks):
-    modified_data = copy.deepcopy(data)
+def filter_and_rank_outcome(page_action_json_all,best_image):
+
+    modified_data = copy.deepcopy(page_action_json_all)
     modified_data['action_tasks'] = []
+    modified_data_loop_over = copy.deepcopy(page_action_json_all)
     ai = 0
 
     # Ratios for conversion
     # x_ratio = resize_screenshot_result_all_chunks['original_width'] / resize_screenshot_result_all_chunks['new_width']
     # y_ratio = resize_screenshot_result_all_chunks['original_height'] / resize_screenshot_result_all_chunks['new_height']
 
-    for task in data['action_tasks']:
+    for task in modified_data_loop_over['action_tasks']:
+        #print(task)
         for candidate in task['candidates']:
             if 'combined_score' not in candidate:
                 candidate['combined_score'] = (
@@ -942,30 +1009,15 @@ def filter_and_rank_outcome(data, dimension_info,resize_screenshot_result_all_ch
             # Convert coordinates to original image space
             if 'coordinates' in candidate and candidate['coordinates'] is not None:
 
-                c_for_ratio = resize_screenshot_result_all_chunks[f'chunk_{candidate['image_number']}.png']
-                print(c_for_ratio)
-                x_ratio = c_for_ratio['original_width'] / c_for_ratio['new_width']
-                y_ratio = c_for_ratio['original_height'] / c_for_ratio['new_height']
-                print(x_ratio,y_ratio)
+                x_ratio = best_image['original_dimensions']['width'] / best_image['resized_dimensions']['width']
+                y_ratio = best_image['original_dimensions']['height'] / best_image['resized_dimensions']['height']
+                #print(x_ratio,y_ratio)
 
-                add_height = 0
-                for c in dimension_info['chunks']:
-                    if c['chunk_number'] == candidate['image_number']:
-                        add_height = c['coordinates']['top'] #* y_ratio
-                        print(f"{c} was the right chunk")
-                        break
-
-                candidate['scroll_to']=add_height
                 candidate['coordinates_ready_to_act'] = {
                     'x': candidate['coordinates']['x'] * x_ratio,
                     'y': candidate['coordinates']['y'] * y_ratio
                 }
-                candidate['coordinates_ready_to_draw'] = {
-                    'x': candidate['coordinates']['x'] * x_ratio,
-                    'y': candidate['coordinates']['y'] * y_ratio+add_height
-                }
-
-                print(f"Coordinates for action {ai} candidate: {candidate['coordinates_ready_to_act']} where previously {candidate['coordinates']} and we scrolled to {add_height}")
+                candidate['coordinates_ready_to_draw'] = candidate['coordinates_ready_to_act']
 
         sorted_candidates = sorted(task['candidates'], key=lambda x: x['combined_score'], reverse=True)
         for rank, candidate in enumerate(sorted_candidates, start=1):
@@ -985,7 +1037,7 @@ def filter_and_rank_outcome(data, dimension_info,resize_screenshot_result_all_ch
 
 
 
-def send_action_request(payload, wait_time,run_rerun_path):
+def send_action_request(payload, wait_time,run_rerun_path,draw_no_action):
     """
     Sends a POST request to the FastAPI endpoint with the given payload and wait_time.
 
@@ -996,11 +1048,16 @@ def send_action_request(payload, wait_time,run_rerun_path):
     url = "http://127.0.0.1:8000/perform-actions"  # Update the URL if the endpoint runs on a different host/port
 
     try:
-        response = requests.post(url, json=payload, params={"wait_time": wait_time, "run_rerun_path": run_rerun_path})
+        response = requests.post(url, json=payload, params={"wait_time": wait_time, "run_rerun_path": run_rerun_path,"draw_no_action":draw_no_action,    "center_opacity": 0.4,
+    "mid_opacity":0.0,
+    "outer_opacity":0.5,
+    "border_thickness": 4,"diameter": 15})
+        
         response.raise_for_status()  # Raise an HTTPError if the response status is 4xx/5xx
         return response.json()
     except requests.RequestException as e:
-        print(f"Error sending action request: {e}")
+        #print(f"Error sending action request: {e}")
+        logger.error(f"Error sending action request: {e}")
         return None
 
 # helper.py
@@ -1063,9 +1120,9 @@ def draw_elements(page_action_json: dict, draw_dots: bool, diameter=20, introduc
                 timeout=10
             )
             if dot_response.status_code != 200:
-                print(f"Error drawing dots: {dot_response.json()}")
+                logger.error(f"Error drawing dots, response code {dot_response.status_code}: {dot_response.json()}")
         except Exception as e:
-            print(f"Exception during dot drawing: {e}")
+            logger.error(f"Exception during dot drawing, response code {dot_response.status_code}: {e}")
     
     # Screenshot functionality is disabled but kept for reference
     screenshot_response = None
@@ -1148,102 +1205,171 @@ def create_highlighted_screenshot(run_id, run_data, workflow_step_path_temp, pag
                 img.save(highlighted_image_path)
                 #print(f"Saved highlighted screenshot: {highlighted_image_path}")
         except Exception as e:
-            print(f"Error creating highlighted image: {e}")
+            logger.error(f"Error creating highlighted image: {e}")
     else:
-        print("No bounding boxes found to highlight")
+        logger.error("No bounding boxes found to highlight")
 
-
-def create_highlighted_screenshot_cairo(run_id, run_rerun_path, page_action_json_ranked, resize_screenshot_result):
+def create_highlighted_screenshot_cairo(run_rerun_path, bbox_payload,file_for_cairo):
     """
-    Creates a highlighted screenshot based on the given bounding boxes using Cairo.
-    Uses element bounding boxes which are already in viewport space.
+    Creates a highlighted screenshot with all bounding boxes from bbox_payload
+    drawn on the same image.
     
     Args:
-        run_id (int): Current run ID
-        run_data (dict): Data for the current run
-        workflow_step_path_temp (str): Path to temporary workflow files
-        page_action_json_ranked (dict): Action JSON containing tasks and candidates
-        resize_screenshot_result (dict): Screenshot resize information
-        highlighted_images_dir (str): Directory to save highlighted screenshots
+        run_rerun_path (str): Path to the run folder.
+        bbox_payload (dict): Dictionary with bounding boxes for the image.
     """
-    #print("\nStarting highlight creation...")
-    #print(f"Resize screenshot result: {resize_screenshot_result}")
+    # Combine all bounding boxes into one list
+    all_bounding_boxes = []
+    for _, b_and_st in bbox_payload.items():
+        all_bounding_boxes.extend(b_and_st)  # Merge all bounding boxes
+
+    # Define paths
+    original_image_path = f"{run_rerun_path}/chunks/{file_for_cairo}"
+    highlighted_image_path = f"{run_rerun_path}/highlights/highlights.png"
+
+    # Draw all bounding boxes on the image
+    draw_with_cairo(original_image_path, highlighted_image_path, all_bounding_boxes)
+
+def check_coordinates_llm(workflow_instructions,site_wide_instructions,site_description,run_rerun_path,coordinate_info_to_review):
+    """Performs LLM analysis to generate action plan."""
+    #print("Starting vision analysis")
+    final_screenshot_path = f"{run_rerun_path}/dots/final_screenshot.png"
+
+    if not os.path.exists(final_screenshot_path): # Check if the resized image exists
+        logger.error(f"Error: final screenshot not found at {final_screenshot_path}")
+
+
+    coor_check_prompt = f"""
+    You are analyzing the following a website ({site_description}) and trying to conduct the following action: 
+    {workflow_instructions}
+
+    Keep the following general guidelines about this site in mind:
+    {site_wide_instructions}
+
+    Review the following coordinates and determine if they are correctly identified in the screenshot. If not, provide the correct coordinates in the JSON format defined below for each element. You provided the coordinates initially which led to the blue radial dots being drawn where they are. However, you may not be correct and even if the coordinats do seem correct to you, but the blue dots are off, you should calibrate yourself and try to adjust the coordinates toward a more correct position.
+
+    Actions and coordinates you provided intially for the drawn blue dots:
+    {coordinate_info_to_review}
+
+    """+"""
+    Your Output Schema:
+    [
+         {
+            "action_id": "integer", // action_id referencing the action in the coordinates above.
+            "location_of_dot_compared_to_element": "string", // describe where the dot is in relation to the element (e.g. in the upper right corner of the element OR to the right of the element, etc.)
+            "dot_identifier_is_over_element": boolean, // true if the blue dot centered around a part of the right element, even if not perfectly
+            "dot_identifier_is_not_perfect": boolean,
+            "describe_how_to_perfect": "string", // in detail describe how the initial coorinates should be adjusted in terms of directional changes (slightly more right and up) and by what number of pixels.
+            "x": "integer", // best new estimate for x coordinate (if needed change)
+            "y": "integer" // best new estimate for y coordinate (if needed change)
+        }
+    ]
+    Begin your output in strict JSON-only format now:
+
+    """
+    #print(f"PROMPT for runID {run_id}: ",action_prompt)
+
+    coor_check_results,coor_check_raw = analyze_page_actions(screenshot_path=[final_screenshot_path], prompt=coor_check_prompt, api='claude')
     
-    
-    bounding_boxes = []
-    for action_task in page_action_json_ranked.get("action_tasks", []):
-        #print(f"\nProcessing action task: {action_task.get('description')}")
-        
-        for candidate in action_task.get("candidates", []):
-            if candidate.get("to_act") and "element_metadata" in candidate:
-                bbox = candidate["element_metadata"].get("boundingBox", {})
-                if bbox:
-                    #print(f"Found bounding box: {bbox}")
-                    bounding_boxes.append(bbox)  # Use as-is, already in viewport space
-    
-    if bounding_boxes:
-        #print(f"\nDrawing {len(bounding_boxes)} bounding boxes")
-        original_image_path = f"{run_rerun_path}/chunks/chunk_1.png"
-        highlighted_image_path = f"{run_rerun_path}/highlights/chunk_1.png"
-        
-        # Use draw_with_cairo to create the highlighted image
-        draw_with_cairo(original_image_path, highlighted_image_path, [], bounding_boxes) # Coordinates are not used for drawing, only bounding boxes
-        #print(f"Saved highlighted screenshot: {highlighted_image_path}")
-    else:
-        print("No bounding boxes found to highlight")
 
-# def perform_initial_setup(run_id, workflow_step_path, max_chunks=None):
-#     """Performs initial setup for a run, including resizing and metadata gathering."""
-#     print("Starting metadata gathering w/ window resizing")
-#     start_time = time.time()
-#     resize_browser_result = resize_browser_window(width=1252, height=1292)
-#     url_metadata, screenshot_data = run_metadata_gather(
-#         workflow_name=workflow_step_path, overlap_percentage=20, max_chunks=max_chunks
-#     )
-#     print(f"Finished gathering metadata with lap time: {time.time() - start_time}")
-
-#     resize_screenshot_result = resize_and_crop(
-#         input_path=f'{workflow_step_path}/chunk_1.png',
-#         output_path=f'{workflow_step_path}/resized_orig.png'
-#     )
-#     copy_and_rename_file(f'{workflow_step_path}/resized_orig.png', f'{workflow_step_path}/resized.png')
-#     print(f"Resized image with lap time: {time.time() - start_time}")
-
-#     return resize_browser_result, url_metadata, screenshot_data
+    if 'results' in coor_check_results:
+        coor_check_results = coor_check_results['results']
+    #print(f"Total candidates: {len(page_action_json_ranked.get('action_tasks', []))} with lap time: {time.time()-start_time}, about to perform actions")
+    return coor_check_results,coor_check_prompt,coor_check_raw
 
 
 
-# ... (other functions in helper.py) ...
 
-def perform_llm_analysis(workflow_memory, extra_instructions, site_wide_instructions, run_rerun_path, workflow_instructions, resize_screenshot_result_all_chunks,screenshot_data, run_id, start_time,advice,summary):
+def perform_llm_fold_test(fold_tests,fold_test_paths,workflow_instructions,site_wide_instructions,site_description):
     """Performs LLM analysis to generate action plan."""
     #print("Starting vision analysis")
 
 
-    resized_image_paths = []
-    for c in resize_screenshot_result_all_chunks.keys():
-        resized_image_path = f'{run_rerun_path}/chunks/resized_{c}'
-        if not os.path.exists(resized_image_path): # Check if the resized image exists
-            print(f"Error: Resized image not found at {resized_image_path}")
+    for c in fold_test_paths:
+        if not os.path.exists(c): # Check if the resized image exists
+            logger.error(f"Error: Resized image not found at {c}")
             return None  # Or handle the error appropriately
-        else:
-            resized_image_paths.append(resized_image_path)
 
 
-    page_action_json_ranked = analyze_raw_screenshot(
-        workflow_memory,
+    page_action_json_ranked,action_prompt,raw = analyze_fold_test(
+        fold_tests=fold_tests,
+        fold_test_paths=fold_test_paths,workflow_instructions=workflow_instructions,site_wide_instructions=site_wide_instructions,site_description = site_description
+    )
+    logger.info(f"Completed fold test LLM call")
+
+    if 'results' in page_action_json_ranked:
+        page_action_json_ranked = page_action_json_ranked['results']
+    #print(f"Total candidates: {len(page_action_json_ranked.get('action_tasks', []))} with lap time: {time.time()-start_time}, about to perform actions")
+    return page_action_json_ranked,action_prompt,raw
+
+
+def get_fold_test_prompt(fold_tests,workflow_instructions,site_wide_instructions,site_description):
+    prompt = f"""You are analyzing the following web application: 
+    {site_description}
+
+    Keep the following general guidelines about this site in mind: {site_wide_instructions}
+
+    Analyze the following images and determine if you can identify elements necessary to help the user perform the following action in each image. Not all images will have all of the elements necessary:
+    User Action:
+    {workflow_instructions}
+    
+    In strict JSON specify how many relevant elements can you identify in each image and if you can locate sufficient elements to help the user perform the actions. Also specify how clearly you think you can identify general elements in each image.
+    
+    """+"""
+    Your Output Schema:
+    [{
+        "id": "integer", // number part of the Image ID (e.g., 1 for Image 1)
+        "relevant_elements": "integer",
+        "sufficient_elements": "boolean",
+        "clarity": "integer" // 1-5 scale (1: very unclear, 5: very clear)
+    },...]
+
+    Begin strict JSON only output now:
+    """
+    # for test in fold_tests:
+    #     prompt += f"Image {test['id']}: Width: {test['width']} / : Height: {test['height']}\n"
+    return prompt
+
+# Function to analyze raw screenshot
+def analyze_fold_test(
+        fold_tests,
+        fold_test_paths,workflow_instructions,site_wide_instructions,site_description):
+        
+
+    action_prompt = get_fold_test_prompt(fold_tests= fold_tests,workflow_instructions=workflow_instructions,site_wide_instructions=site_wide_instructions,site_description = site_description)
+
+    #print(f"PROMPT for runID {run_id}: ",action_prompt)
+
+    page_action_json_all,raw = analyze_page_actions(screenshot_path=fold_test_paths, prompt=action_prompt, api='claude')
+    return page_action_json_all,action_prompt,raw
+
+
+
+
+def perform_llm_analysis(extra_instructions, site_wide_instructions,site_description, run_rerun_path, workflow_instructions, best_image, run_id, start_time,advice,summary):
+    """Performs LLM analysis to generate action plan."""
+    #print("Starting vision analysis")
+
+
+    resized_image_path_test = f'{run_rerun_path}/chunks/resized_chunk_{best_image['id']}.png'
+    if not os.path.exists(resized_image_path_test): # Check if the resized image exists
+        logger.error(f"Error: Resized image not found at {resized_image_path_test}")
+    # else:
+    #     resized_image_path = resized_image_path_test
+
+
+    page_action_json_ranked,action_prompt,page_action_json_all = analyze_raw_screenshot(
         extra_instructions,
-        site_wide_instructions,
-        resized_image_paths,
+        site_wide_instructions,site_description,
+        resized_image_path_test,
         workflow_instructions,
-        dimension_info=screenshot_data,
-        resize_screenshot_result_all_chunks = resize_screenshot_result_all_chunks,
+        best_image=best_image,
         run_id=run_id,
         advice=advice,
         summary=summary
     )
     #print(f"Total candidates: {len(page_action_json_ranked.get('action_tasks', []))} with lap time: {time.time()-start_time}, about to perform actions")
-    return page_action_json_ranked
+    return page_action_json_ranked,action_prompt
 
 import os
 
@@ -1318,18 +1444,9 @@ def run_metadata_gather(output_path, overlap_percentage=20, max_chunks=None,wait
         return url_metadata, screenshot_data
 
     except Exception as e:
-        print(f"Error during metadata gather: {e}")
+        logger.error(f"Error during metadata gather: {e}")
         raise
 
-def reset_workflow(workflow_id, workflow_instructions, extra_instructions):
-    workflow_memory = {}
-    workflow_memory['workflow_id'] = workflow_id
-    workflow_memory['workflow_instructions'] = workflow_instructions
-    workflow_memory['previous_state_advice'] = ''
-    workflow_memory['extra_instructions'] = extra_instructions
-    workflow_memory['run_db'] = {}
-    workflow_memory['summary'] = ''
-    return workflow_memory
 
 def add_step_to_run_data(run_data, step_type, details, data=None):
     """Adds a step to the run_data with the given type, details, and optional data."""
@@ -1352,7 +1469,7 @@ def initialize_run_data(run_id, rerun_ct):
     }
 
 
-def handle_negative_evaluation(eval_json, workflow_memory, page_action_json_ranked):
+def handle_negative_evaluation(eval_json):
     """Handles the case where the evaluation is negative (not overall_goal_success)."""
     advice = f"ADVICE FROM PREVIOUS STEPS OR RUNS: Consider this advice from previous attempts to guide you what to do next.: {eval_json['run_advice']}\n"
     summary = f"OVERALL PROCESS SUMMARY: Consider this summary from previous attempts to guide you what to do next.: {eval_json['summary']}\n"
@@ -1374,7 +1491,7 @@ def handle_negative_evaluation(eval_json, workflow_memory, page_action_json_rank
     # else:
     #     can_continue = False
 
-    return advice, workflow_memory,summary
+    return advice,summary
 
 
 def setup_workflow_folders(workflow_id):
@@ -1467,7 +1584,7 @@ def test_coordinate_consistency(page_action_json_ranked, workflow_step_path, res
                         if bbox:
                             results[-1]['bounding_box'] = bbox
                 except Exception as e:
-                    print(f"Error fetching metadata: {e}")
+                    logger.error(f"Error fetching metadata: {e}")
                     results[-1]['metadata_error'] = str(e)
 
                 # Test drawing a dot in browser at these coordinates
@@ -1478,7 +1595,7 @@ def test_coordinate_consistency(page_action_json_ranked, workflow_step_path, res
                     )
                     results[-1]['dot_draw_result'] = dot_response.json()
                 except Exception as e:
-                    print(f"Error drawing dot: {e}")
+                    logger.error(f"Error drawing dot: {e}")
                     results[-1]['dot_error'] = str(e)
                 
     # Save results
@@ -1487,75 +1604,76 @@ def test_coordinate_consistency(page_action_json_ranked, workflow_step_path, res
     
     return results
 
-def draw_with_cairo(image_path, output_path, coordinates, bounding_boxes):
+
+
+def draw_with_cairo(image_path, output_path, bounding_boxes):
     """
-    Draw visualization using Cairo with improved glowing effect
-    """
-    # print("\nDebug - Drawing inputs:")
-    # print(f"Image path: {image_path}")
-    # print(f"Output path: {output_path}")
-    # print(f"Bounding boxes: {bounding_boxes}")
+    Draw visualization using Cairo with a glowing rectangular effect.
     
-    # Load original image and convert to RGBA
+    Args:
+        image_path (str): Path to the original image.
+        output_path (str): Path to save the highlighted image.
+        bounding_boxes (list): List of bounding box dictionaries with x, y, width, height.
+    """
+    from PIL import Image
+    import cairo
+
+    # Load the original image and convert it to RGBA
     with Image.open(image_path) as img:
         img = img.convert('RGBA')
         width, height = img.size
-        
-        # Convert PIL image to a format Cairo can use
+
+        # Convert the PIL image to a format Cairo can use
         img_data = bytearray(img.tobytes('raw', 'BGRa'))
-    
-    # Create the base surface and paint the background image
+
+    # Create a Cairo surface using the image data
     surface = cairo.ImageSurface.create_for_data(
-        img_data, cairo.FORMAT_ARGB32, width, height, width * 4)
+        img_data, cairo.FORMAT_ARGB32, width, height, width * 4
+    )
     ctx = cairo.Context(surface)
-    
-    # Draw bounding boxes with radial gradient glow
+
+    # Draw bounding boxes with a glowing rectangular effect
     for bbox in bounding_boxes:
         x = bbox['x']
         y = bbox['y']
         w = bbox['width']
         h = bbox['height']
-        
-        # Calculate center and radius for radial gradient
-        center_x = x + w/2
-        center_y = y + h/2
-        radius = max(w/2, h/2) + 10  # Add some padding
-        
-        # Create radial gradient for glow effect
-        gradient = cairo.RadialGradient(
-            center_x, center_y, radius - 10,  # Inner circle
-            center_x, center_y, radius        # Outer circle
-        )
-        
-        # Add multiple color stops for smoother gradient
-        gradient.add_color_stop_rgba(0, 0.2, 0.8, 0.8, 0.3)  # Inner teal
-        gradient.add_color_stop_rgba(0.7, 0.2, 0.8, 0.8, 0.1)  # Mid teal
-        gradient.add_color_stop_rgba(1, 0.2, 0.8, 0.8, 0)    # Transparent edge
-        
-        # Draw rectangle with gradient
-        ctx.set_source(gradient)
-        ctx.set_line_width(2)
-        
-        # Draw multiple rectangles with decreasing opacity for glow
-        for i in range(5):
-            padding = i * 2
+
+        # Glow effect: multiple expanding rectangles with opacity
+        for i in range(15):  # Increase the number of layers for stronger glow
+            padding = i * 3  # Adjust the spread for a noticeable effect
+            alpha = 0.2 if i < 5 else 0.1 - (i - 5) * 0.01  # Stronger glow for inner layers
+
+            ctx.set_source_rgba(0.2, 0.8, 0.8, max(0, alpha))  # Teal color with fading opacity
             ctx.rectangle(
                 x - padding,
                 y - padding,
                 w + (padding * 2),
                 h + (padding * 2)
             )
+            ctx.set_line_width(2)
             ctx.stroke()
-    
-    # Save result
+
+        # Main rectangle outline (solid color)
+        ctx.set_source_rgba(0.2, 0.8, 0.8, 1)  # Solid teal
+        ctx.set_line_width(3)
+        ctx.rectangle(x, y, w, h)
+        ctx.stroke()
+
+    # Save the resulting image
     try:
         surface.write_to_png(output_path)
-        #print(f"Successfully saved Cairo visualization to: {output_path}")
+        logger.info(f"Saved visualization to: {output_path}")
     except Exception as e:
-        print(f"Error saving Cairo visualization: {e}")
+        print(f"Error saving visualization: {e}")
+        logger.error(f"Error saving visualization: {e}")
         raise
-    
+
     return True
+
+
+
+
 
 def test_visualization(workflow_step_path, page_action_json_ranked, resize_screenshot_result):
     """
@@ -1590,17 +1708,14 @@ def test_visualization(workflow_step_path, page_action_json_ranked, resize_scree
         'visualization_path': output_path
     }
 
-def navigate_to_url_from_metadata(url_metadata):
+def navigate_to_url_from_metadata(full_url):
     """
     Navigates to a specific URL using the /navigate FastAPI endpoint.
 
     Args:
         url_metadata: The URL metadata dictionary.
     """
-    navigation_payload = {
-        "status": "success",  # Assuming success for the structure
-        "url_metadata": url_metadata,
-        "dimensions": {}  # You can populate dimensions if needed
+    navigation_payload = {"full_url": full_url
     }
 
     try:
@@ -1608,4 +1723,4 @@ def navigate_to_url_from_metadata(url_metadata):
         response.raise_for_status()  # Raise an exception for bad status codes
         #print(response.json())
     except requests.exceptions.RequestException as e:
-        print(f"Error during navigation: {e}")
+        logger.error(f"Error during navigation: {e}")

@@ -22,6 +22,9 @@ import json
 from pathlib import Path
 
 from playwright.async_api import Error  # Import the correct error class
+from log_config import get_logger
+
+logger = get_logger(__name__)  # Use module name for easier identification
 
 
 
@@ -29,6 +32,7 @@ from playwright.async_api import Error  # Import the correct error class
 async def retry_evaluate(page, script, args=None, retries=3):
     for attempt in range(retries):
         try:
+            logger.info(f"Script evaluated successfully: Attempt {attempt + 1}")
             return await page.evaluate(script, args)
         except Error as e:  # Use the correct Playwright error
             if "Execution context was destroyed" in str(e) and attempt < retries - 1:
@@ -40,40 +44,22 @@ async def retry_evaluate(page, script, args=None, retries=3):
 
 
 # Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('app.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
-logger = logging.getLogger(__name__)
+# logging.basicConfig(
+#     level=logging.INFO,
+#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+#     handlers=[
+#         logging.FileHandler('app.log'),
+#         logging.StreamHandler(sys.stdout)
+#     ]
+# )
+# logger = logging.getLogger(__name__)
 
 
 
 class NavigationRequest(BaseModel):
     url_metadata: dict
 
-class Coordinates(BaseModel):
-    x: float
-    y: float
 
-class Candidate(BaseModel):
-    element_description: str
-    action: str
-    type_text: Optional[str] = None
-    expected_outcome: str
-    keyboard_action: Optional[str] = None
-    coordinates: Optional[Coordinates] = None
-    combined_score: float
-    rank: int
-    to_act: bool
-    candidate_id: int
-    image_number: int
-    coordinates_ready_to_act: Optional[Coordinates] = None
-    coordinates_ready_to_draw: Optional[Coordinates] = None
-    scroll_to: Optional[float] = None  # New field for scroll position
 
 
 
@@ -94,17 +80,42 @@ class Candidate(BaseModel):
 # "genealiziable": float,  // Score how generalizable the action is to any user's data or product configuration (0.0-1.0 with 1.0 being completely generalizable and 0.0 being very currently logged in user specific).
 
 
+
+class Coordinates(BaseModel):
+    x: float
+    y: float
+
+
+class Candidate(BaseModel):
+    image_description: str  # Add this to match the payload
+    element_description: str
+    action: str
+    type_text: Optional[str] = None  # Empty string is allowed by default for Optional[str]
+    expected_outcome: str
+    keyboard_action: Optional[str] = None
+    coordinates: Optional[Coordinates] = None
+    combined_score: float
+    rank: int
+    to_act: bool
+    candidate_id: int
+    image_number: Optional[int] = None  # Make image_number optional if it might be missing
+    coordinates_ready_to_act: Optional[Coordinates] = None
+    coordinates_ready_to_draw: Optional[Coordinates] = None
+    scroll_to: Optional[float] = None  # Keep this if future payloads might include it
+
+
 class ActionTask(BaseModel):
     description: str
     action_id: int
     candidates: List[Candidate]
+
 
 class ActionPayload(BaseModel):
     multiple_steps_required: bool
     visible_elements_from_instructions: str
     summary_of_steps_so_far: str
     action_tasks: List[ActionTask]
-    error: Optional[str] = None
+    error: Optional[str] = ""  # Allow empty string explicitly
     page_description: str
     expected_outcome_hopeful: str
 
@@ -161,6 +172,7 @@ async def lifespan(app: FastAPI):
 # Initialize FastAPI with lifespan manager
 app = FastAPI(lifespan=lifespan)
 
+
 # Add logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -182,28 +194,19 @@ async def log_requests(request: Request, call_next):
         )
         raise
 
-class URLMetadata(BaseModel):
+
+from pydantic import BaseModel
+
+class NavigatePayload(BaseModel):
     full_url: str
-    scheme: str
-    domain: str
-
-class NavigationPayload(BaseModel):
-    status: str
-    url_metadata: URLMetadata
-    dimensions: dict
-
 
 @app.post("/navigate")
-async def navigate_to_state(payload: NavigationPayload):
+async def navigate_to_state(payload: NavigatePayload):
     """
     Navigates to a specific state based on the provided URL metadata.
-    Args:
-        payload: A dictionary containing the URL metadata.
-    Returns:
-        A dictionary indicating the success or failure of the navigation.
     """
     try:
-        full_url = payload.url_metadata.full_url
+        full_url = payload.full_url
         print(f"Navigating to: {full_url}")
         global page
         
@@ -220,6 +223,8 @@ async def navigate_to_state(payload: NavigationPayload):
         return {"status": "success", "message": f"Navigated to {full_url}"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Navigation failed: {e}")
+
+
 
 
 
@@ -643,139 +648,236 @@ async def scroll_to_position(page, scroll_to: float) -> None:
         logger.error(f"Error scrolling to position {scroll_to}: {str(e)}")
         raise
 
-
 async def draw_dots_internal(
-    elements: dict, 
-    diameter: int = 10, 
-    duration: int = 3000, 
-    opacity: float = 0.8,
+    elements: dict,
+    diameter: int = 10,
+    duration: int = 3000,
+    center_opacity: float = 0.0,     # Transparency at the inner center (0 = fully transparent)
+    mid_opacity: float = 0.4,        # Opacity at mid ring
+    outer_opacity: float = 0.0,      # Opacity at the outer ring
+    border_thickness: int = 0,       # Optional hard line at the outer edge; 0 = no line
     screenshot_info: Optional[dict] = None
 ):
     """
-    Internal function to draw dots and optionally take screenshots.
-    screenshot_info should contain:
-    - base_path: base path for screenshots
-    - chunks: list of chunk information
+    Draw a "flare" dot at the given coordinates, with a radial gradient that
+    transitions from 'center_opacity' to 'mid_opacity' to 'outer_opacity'.
+    Optionally draw a hard line (border) around the circle if 'border_thickness' > 0.
+
+    Args:
+        elements (dict): Must contain {'x': <int>, 'y': <int>, 'action_id': <Any>} 
+                         for the dot's center coordinates and optional ID.
+        diameter (int): Base diameter for the dot. The flare will be sized at ~3x this for effect.
+        duration (int): How long (ms) to keep the dot in the DOM (then remove it).
+        center_opacity (float): Opacity at the center region (0.0 to 1.0).
+        mid_opacity (float): Opacity at the mid radius region (0.0 to 1.0).
+        outer_opacity (float): Opacity near the outer radius region (0.0 to 1.0).
+        border_thickness (int): Thickness in px of an optional outer border; 0 = none.
+        screenshot_info (dict, optional): If you still want to do an immediate screenshot,
+                                          pass the relevant info here; otherwise ignore.
+
+    Example radial gradient stops:
+      0-10%:    center_opacity
+      10-40%:   mid_opacity
+      40-80%:   outer_opacity
+      beyond 80%: fully transparent
+
+    Returns:
+        dict: Information about the success status and how many elements were drawn.
     """
     global page
-    logger.info("Starting internal dot drawing...")
-    
+    logger.info("Starting internal dot drawing with radial gradient...")
+
     try:
         if not page:
             raise ValueError("Page not initialized")
 
+        # Ensure page is fully loaded
         await ensure_load_state(page)
 
-        # Draw dots on the page
-        logger.debug(f"Drawing dot at coordinates: {elements}")
-        await retry_evaluate(page, '''({ x, y, diameter, opacity, duration }) => {
+        # We increase the "flare" size around the center.  
+        # You can adjust the multiplier for a bigger or smaller glow radius.
+        script = '''({
+            x, y, diameter, duration,
+            centerOpacity, midOpacity, outerOpacity, borderThickness
+        }) => {
             const dot = document.createElement('div');
-            const scrollX = window.scrollX || document.documentElement.scrollLeft;
-            const scrollY = window.scrollY || document.documentElement.scrollTop;
+            
+            // Expand the diameter to produce a bigger glow area
+            const flareDiameter = diameter * 3; 
 
-            Object.assign(dot.style, {
+            // Build the radial gradient with multi-stop fade:
+            //  - 0-10% uses centerOpacity
+            //  - 10-40% uses midOpacity
+            //  - 40-80% uses outerOpacity
+            //  - beyond 80% is fully transparent
+            const gradientCSS = `
+                radial-gradient(circle,
+                  rgba(0, 123, 255, ${centerOpacity}) 10%,
+                  rgba(0, 123, 255, ${midOpacity}) 40%,
+                  rgba(0, 123, 255, ${outerOpacity}) 80%,
+                  rgba(0, 123, 255, 0) 100%
+                )
+            `;
+
+            const styleMap = {
                 position: 'absolute',
-                left: `${x}px`,
-                top: `${y}px`,
-                width: `${diameter}px`,
-                height: `${diameter}px`,
-                backgroundColor: `rgba(0, 123, 255, ${opacity})`,
-                borderRadius: '50%',
+                left: x + 'px',
+                top: y + 'px',
+                width: flareDiameter + 'px',
+                height: flareDiameter + 'px',
+                background: gradientCSS,
                 pointerEvents: 'none',
                 zIndex: '999999',
                 transform: 'translate(-50%, -50%)'
-            });
-            
+            };
+
+            // If borderThickness > 0, draw a solid ring around the entire circle
+            if (borderThickness > 0) {
+                styleMap.border = borderThickness + 'px solid rgba(0, 123, 255, 1)';
+                styleMap.borderRadius = '50%';
+            }
+
+            // Apply all styles
+            for (const [prop, val] of Object.entries(styleMap)) {
+                dot.style[prop] = val;
+            }
+
+            // Add the dot to the DOM
             document.body.appendChild(dot);
+
+            // Remove after 'duration' ms
             setTimeout(() => dot.remove(), duration);
-        }''', {'x': elements['x'], 'y': elements['y'], 'diameter': diameter, 'opacity': opacity, 'duration': duration})
+        }''';
 
-        # Take screenshots if requested
-        output_path = os.path.join(
-            screenshot_info['base_path'],'dots',
-            f"chunk_{elements['image_number']}.png"
-        )
-        logger.info(f"Taking screenshot for dot at coordinates: {elements} and storing at: {output_path}")
-        await take_screenshot_internal(output_path)
+        await retry_evaluate(page, script, {
+            'x': elements['x'],
+            'y': elements['y'],
+            'diameter': diameter,
+            'duration': duration,
+            'centerOpacity': center_opacity,
+            'midOpacity': mid_opacity,
+            'outerOpacity': outer_opacity,
+            'borderThickness': border_thickness
+        })
 
-        logger.info(f"Successfully drew {len(elements)} dots.")
+        logger.info("Radial flare dot drawn successfully.")
+
+        # If you want an immediate screenshot for each dot (not recommended if you only want one final screenshot),
+        # you could do:
+        #
+        # if screenshot_info:
+        #     output_path = os.path.join(
+        #         screenshot_info['base_path'],
+        #         'dots',
+        #         f"chunk_{elements['action_id']}.png"
+        #     )
+        #     logger.info(f"Taking screenshot -> {output_path}")
+        #     await take_screenshot_internal(output_path)
+
         return {
             "status": "success",
-            "message": "Dots drawn successfully",
+            "message": "Flare dot(s) drawn successfully",
             "count": len(elements)
         }
 
     except Exception as e:
-        logger.error(f"Failed to draw dots: {str(e)}")
+        logger.error(f"Failed to draw radial dots: {str(e)}")
         raise
+
 
 async def perform_single_action(
     page, 
     task: ActionTask, 
     feedback_metadata: list, 
     wait_time: int,
-    run_rerun_path: str
+    run_rerun_path: str,
+    draw_no_action: bool = False,
+    center_opacity=0.2,
+    mid_opacity=0.6,
+    outer_opacity=0.1,
+    border_thickness=2,
+    diameter = 20
 ):
-    """Perform actions for a single task and collect metadata."""
-
-    # log the start of wait
-    logger.info(f"Waiting for load state within perform_single_action for action_id={task.action_id}")
     await page.wait_for_load_state("load")
-    logger.info(f"Load state reached within perform_single_action for action_id={task.action_id}")
-
-    print(task.candidates)
 
     for candidate in task.candidates:
-        if candidate.to_act:  # Only act if to_act is True
-            coordinates = candidate.coordinates_ready_to_act
-            coordinates_to_draw = candidate.coordinates_ready_to_draw
+        if not candidate.to_act:
+            continue
 
+        coordinates = candidate.coordinates_ready_to_act
+        coordinates_to_draw = candidate.coordinates_ready_to_draw
+
+        # 1) If we are in "draw only" mode:
+        if draw_no_action:
+            if coordinates_to_draw:
+                # Draw the dot, but do NOT sleep afterwards
+                # await draw_dots_internal(
+                #     elements={
+                #         'x': coordinates_to_draw.x,
+                #         'y': coordinates_to_draw.y,
+                #         'action_id': task.action_id
+                #     },
+                #     diameter=20,
+                #     duration=3000,
+                #     opacity=0.8,
+                #     screenshot_info={'base_path': f"{run_rerun_path}"}
+                # )
+                await draw_dots_internal(
+                    elements={
+                        'x': coordinates_to_draw.x,
+                        'y': coordinates_to_draw.y,
+                        'action_id': task.action_id
+                    },
+                    diameter=diameter,
+                    duration=3000,
+                    center_opacity=center_opacity,
+                    mid_opacity=mid_opacity,
+                    outer_opacity=outer_opacity,
+                    border_thickness=border_thickness,
+                    screenshot_info={'base_path': f"{run_rerun_path}"}
+                )
+            
+            # We can still collect metadata if desired
             if coordinates:
-                # Scroll to position if specified
-                if candidate.scroll_to is not None:
-                    logger.info(f"Scrolling to position: {candidate.scroll_to}")
-                    await scroll_to_position(page, candidate.scroll_to)
-                    logger.info(f"Scrolled to position: {candidate.scroll_to}")
-
-                # Draw dot directly by calling the function instead of the endpoint
-                try:
-                    logger.info(f"Drawing dot at x={coordinates_to_draw.x}, y={coordinates_to_draw.y}")
-                    await draw_dots_internal(
-                        elements={'x': coordinates_to_draw.x, 'y': coordinates_to_draw.y,'image_number':candidate.image_number},
-                        diameter=20,
-                        duration=3000,
-                        opacity=0.8,
-                        screenshot_info={
-                            'base_path': f"{run_rerun_path}",  # You'll need to pass run_rerun_path
-                        }
-                    )
-                    logger.info(f"Drawn dot")
-                    await asyncio.sleep(3)
-                except Exception as e:
-                    logger.error(f"Error drawing dot: {e}")
-
-                # Get element metadata and perform coordinate-based actions
-                logger.info(f"Getting element metadata at x={coordinates.x}, y={coordinates.y}")
                 metadata = await get_element_metadata(page, coordinates.x, coordinates.y)
                 feedback_metadata.append({
                     "action_id": task.action_id,
                     "description": task.description,
                     "candidate_id": candidate.candidate_id,
                     "coordinates": {"x": coordinates.x, "y": coordinates.y},
-                    "scroll_position": candidate.scroll_to,
                     "element_metadata": metadata,
                     "expected_outcome": candidate.expected_outcome
                 })
-                logger.info(f"Element metadata at x={coordinates.x}, y={coordinates.y}")
 
+            # **No sleep** here at all.
+
+        # 2) If we're performing real actions:
+        else:
+            if coordinates:
+                # Optionally gather metadata
+                metadata = await get_element_metadata(page, coordinates.x, coordinates.y)
+                feedback_metadata.append({
+                    "action_id": task.action_id,
+                    "description": task.description,
+                    "candidate_id": candidate.candidate_id,
+                    "coordinates": {"x": coordinates.x, "y": coordinates.y},
+                    "element_metadata": metadata,
+                    "expected_outcome": candidate.expected_outcome
+                })
+
+                # Perform the actual user action
                 if candidate.action == "click":
                     await page.mouse.click(coordinates.x, coordinates.y)
+
                 elif candidate.action == "type" and candidate.type_text:
                     await page.mouse.click(coordinates.x, coordinates.y)
                     await page.keyboard.type(candidate.type_text)
 
+                # If you want to wait *after each action*, do it here:
+                await asyncio.sleep(wait_time / 1000)
+
             elif candidate.keyboard_action:
-                # Perform keyboard-only actions
+                # Keyboard-only action
                 await page.keyboard.press(candidate.keyboard_action)
                 feedback_metadata.append({
                     "action_id": task.action_id,
@@ -785,18 +887,33 @@ async def perform_single_action(
                     "expected_outcome": candidate.expected_outcome
                 })
 
-            # Wait specified time between actions
-            await asyncio.sleep(wait_time / 1000)  # Convert to seconds
+                # If you want to wait after keyboard actions, do it here:
+                await asyncio.sleep(wait_time / 1000)
+
 
 
 @app.post("/perform-actions")
-async def perform_actions(payload: ActionPayload, wait_time: int,run_rerun_path:str) -> List[dict]:
+async def perform_actions(
+    payload: ActionPayload,
+    wait_time: int,
+    run_rerun_path: str,
+    draw_no_action: bool = False,  # <-- New flag
+    center_opacity: float = 0.2,
+    mid_opacity: float=0.6,
+    outer_opacity: float=0.1,
+    border_thickness: float=2,
+    diameter: int=20
+) -> List[dict]:
     """
     Perform a series of actions on the page based on the provided payload.
 
     Args:
-        payload: Complex action payload containing tasks and candidates.
-        wait_time: Time to wait between actions in milliseconds.
+        payload (ActionPayload): Complex action payload containing tasks and candidates.
+        wait_time (int): Time to wait between actions in milliseconds.
+        run_rerun_path (str): Base path used for any potential screenshot.
+        draw_no_action (bool): 
+            - If True, only draw dots (no clicks), then take ONE final screenshot. 
+            - If False, perform the real actions (clicks, typing, etc.) with NO screenshot.
 
     Returns:
         List[dict]: Feedback metadata for all performed actions.
@@ -808,7 +925,7 @@ async def perform_actions(payload: ActionPayload, wait_time: int,run_rerun_path:
     logger.info("Starting perform-actions endpoint.")
 
     try:
-        # Ensure Playwright session and page readiness
+        # 1. Ensure Playwright session and page readiness
         if not playwright or not browser or not page:
             logger.error("Playwright session not initialized.")
             raise HTTPException(
@@ -817,13 +934,12 @@ async def perform_actions(payload: ActionPayload, wait_time: int,run_rerun_path:
             )
 
         logger.info("Ensuring page load state...")
-        print('Ensuring page load state...')
         await ensure_load_state(page)
-        print("Page load state ensured.")
+        logger.info("Page load state ensured.")
 
         feedback_metadata = []
 
-        # Process each action task
+        # 2. Process each action task
         for task in payload.action_tasks:
             logger.info(f"Processing task with action_id={task.action_id}")
             try:
@@ -832,7 +948,13 @@ async def perform_actions(payload: ActionPayload, wait_time: int,run_rerun_path:
                     task=task,
                     feedback_metadata=feedback_metadata,
                     wait_time=wait_time,
-                    run_rerun_path=run_rerun_path
+                    run_rerun_path=run_rerun_path,
+                    draw_no_action=draw_no_action,  # <--- Important
+                    center_opacity=center_opacity,
+                    mid_opacity=mid_opacity,
+                    outer_opacity=outer_opacity,
+                    border_thickness=border_thickness,
+                    diameter=diameter
                 )
             except Exception as e:
                 logger.error(f"Failed to perform action for action_id={task.action_id}: {str(e)}")
@@ -841,6 +963,14 @@ async def perform_actions(payload: ActionPayload, wait_time: int,run_rerun_path:
                     "error": f"Failed to perform action: {str(e)}",
                     "description": task.description
                 })
+
+        # 3. If we are drawing dots (draw_no_action=True), 
+        #    take ONE final screenshot after all dots are in place.
+        if draw_no_action:
+            # Example: "final_screenshot.png"
+            final_screenshot_path = os.path.join(run_rerun_path, "dots", f"final_screenshot.png")
+            logger.info(f"Taking ONE final screenshot of all dots: {final_screenshot_path}")
+            await take_screenshot_internal(final_screenshot_path)
 
         logger.info("All actions processed successfully.")
         return feedback_metadata
@@ -851,6 +981,7 @@ async def perform_actions(payload: ActionPayload, wait_time: int,run_rerun_path:
             status_code=500,
             detail=f"Failed to perform actions: {str(e)}"
         )
+
 
 
 @app.post("/draw_dots")
@@ -942,17 +1073,58 @@ async def draw_dots(elements: List[CoordinatePoint], diameter: int = 10, duratio
                 "details": str(e)
             }
         )
-
-
-# In fastAPIServ.py
+    
 
 @app.get("/extract_metadata")
-async def extract_metadata(x: Optional[float] = None, y: Optional[float] = None) -> dict:
-    """Extract metadata about the page and specific element if coordinates provided."""
+async def extract_metadata(
+    x: Optional[float] = None,
+    y: Optional[float] = None,
+    steps: int = 10,
+    wait_per_step_ms: int = 500,
+    overlap_percent: int = 10
+) -> dict:
+    """
+    Scrolls down in steps until the bottom is reached or steps are exhausted.
+    Then scrolls back to the top and extracts metadata.
+    """
     global playwright, browser, page
-    
+
     try:
-        # Base metadata...
+        # 1) Get viewport height
+        viewport_height = await page.evaluate("window.innerHeight")
+
+        # Fraction of viewport to scroll each step
+        overlap_fraction = 1 - (overlap_percent / 100.0)
+        scroll_increment = viewport_height * overlap_fraction
+
+        current_scroll_position = 0
+        max_scroll_height = await page.evaluate(
+            "document.documentElement.scrollHeight"
+        )
+
+        # 2) Scroll down in overlapping steps
+        for step in range(steps):
+            # Check if at or near the bottom
+            if current_scroll_position + viewport_height >= max_scroll_height:
+                print(f"Reached bottom of the page at step {step + 1}.")
+                break
+
+            # Scroll down
+            current_scroll_position += scroll_increment
+            await page.evaluate(f"window.scrollTo(0, {current_scroll_position})")
+            await asyncio.sleep(wait_per_step_ms / 1000.0)
+
+            # Update max_scroll_height dynamically (e.g., for infinite scrolling pages)
+            max_scroll_height = await page.evaluate(
+                "document.documentElement.scrollHeight"
+            )
+
+        # 3) Scroll back to top
+        await page.evaluate("window.scrollTo(0, 0)")
+        await asyncio.sleep(1.0)
+
+        # 4) Extract metadata
+        from urllib.parse import urlparse  # if not already imported
         metadata = {
             "status": "success",
             "url_metadata": {
@@ -966,98 +1138,48 @@ async def extract_metadata(x: Optional[float] = None, y: Optional[float] = None)
                     height: window.innerHeight
                 },
                 fullPage: {
-                    width: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth),
-                    height: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
+                    width: Math.max(
+                        document.documentElement.scrollWidth,
+                        document.body.scrollWidth
+                    ),
+                    height: Math.max(
+                        document.documentElement.scrollHeight,
+                        document.body.scrollHeight
+                    )
                 },
                 percentageViewable: 100
             })''')
         }
 
-        # If coordinates provided, get EXACT element at those coordinates
+        # 5) Extract element info if coordinates provided
         if x is not None and y is not None:
-            element_info = await retry_evaluate(page, '''({ x, y }) => {
-                // Get the exact element at the coordinates
-                const element = document.elementFromPoint(x, y);
-                if (!element) return null;
-                
-                // If it's the Delete link or any interactive element, use it directly
-                if (element.tagName === 'A' || 
-                    element.tagName === 'BUTTON' || 
-                    element.onclick || 
-                    element.getAttribute('role') === 'button' ||
-                    getComputedStyle(element).cursor === 'pointer') {
-                    
+            element_info = await retry_evaluate(
+                page,
+                '''({ x, y }) => {
+                    const element = document.elementFromPoint(x, y);
+                    if (!element) return null;
+
                     const rect = element.getBoundingClientRect();
-                    const scrollX = window.scrollX;
-                    const scrollY = window.scrollY;
-                    
                     return {
                         tagName: element.tagName,
                         id: element.id,
                         className: element.className,
                         innerText: element.innerText,
                         boundingBox: {
-                            x: rect.left + scrollX,
-                            y: rect.top + scrollY,
+                            x: rect.left + window.scrollX,
+                            y: rect.top + window.scrollY,
                             width: rect.width,
                             height: rect.height
                         }
                     };
-                }
-                
-                // If not interactive, look for closest interactive parent
-                let currentElement = element;
-                while (currentElement && currentElement.tagName !== 'BODY') {
-                    if (currentElement.tagName === 'A' || 
-                        currentElement.tagName === 'BUTTON' || 
-                        currentElement.onclick || 
-                        currentElement.getAttribute('role') === 'button' ||
-                        getComputedStyle(currentElement).cursor === 'pointer') {
-                        
-                        const rect = currentElement.getBoundingClientRect();
-                        const scrollX = window.scrollX;
-                        const scrollY = window.scrollY;
-                        
-                        return {
-                            tagName: currentElement.tagName,
-                            id: currentElement.id,
-                            className: currentElement.className,
-                            innerText: currentElement.innerText,
-                            boundingBox: {
-                                x: rect.left + scrollX,
-                                y: rect.top + scrollY,
-                                width: rect.width,
-                                height: rect.height
-                            }
-                        };
-                    }
-                    currentElement = currentElement.parentElement;
-                }
-                
-                // Fallback to original element if no interactive element found
-                const rect = element.getBoundingClientRect();
-                const scrollX = window.scrollX;
-                const scrollY = window.scrollY;
-                
-                return {
-                    tagName: element.tagName,
-                    id: element.id,
-                    className: element.className,
-                    innerText: element.innerText,
-                    boundingBox: {
-                        x: rect.left + scrollX,
-                        y: rect.top + scrollY,
-                        width: rect.width,
-                        height: rect.height
-                    }
-                };
-            }''', {'x': x, 'y': y})
-            
+                }''',
+                {'x': x, 'y': y}
+            )
             if element_info:
                 metadata["element_info"] = element_info
 
         return metadata
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -1088,57 +1210,54 @@ async def take_screenshot_internal(
         raise
 
 from fastapi.responses import JSONResponse  # Add this import at the top
+import os
+import math
+from datetime import datetime
+from fastapi import APIRouter, Query
+from fastapi.responses import JSONResponse
+from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 
+
+#router = APIRouter()
 @app.get("/screenshot")
 async def screenshot(
     output_path: str,
-    overlap_percentage: float = Query(30, ge=0, le=100, description="Overlap percentage between chunks"),
+    overlap_percentage: float = Query(30, ge=0, le=100,
+                                      description="Overlap percentage between chunks"),
     max_chunks: int = 10,
     wait_after_scroll: int = 500,
     action_id: int = None,
-    candidate_id: int = None
+    candidate_id: int = None,
+    single_chunk_override_id: int = None
 ) -> JSONResponse:
     """
-    Take chunked screenshots of the current page with detailed coordinate information.
+    Take viewport screenshots at specified heights. Parameters maintained for interface compatibility.
     """
     global playwright, browser, page
     start_time = datetime.now()
-    logger.info(f"Starting screenshot process with overlap {overlap_percentage}%.")
+    logger.info(f"Starting screenshot process for viewport {single_chunk_override_id}")
 
     try:
         if not playwright or not browser or not page:
             return JSONResponse(
-                status_code=503, 
+                status_code=503,
                 content={"error": "Playwright session not initialized"}
             )
 
-        await ensure_load_state(page)
+        os.makedirs(output_path, exist_ok=True)
 
-        # Get initial dimensions
-        logger.info("Retrieving initial page dimensions...")
+        await ensure_load_state(page)
+        
+        # Get viewport dimensions
         dimensions = await retry_evaluate(page, '''async () => {
-            const viewport = {
-                width: window.innerWidth,
-                height: window.innerHeight
-            };
-            
-            const height = Math.max(
-                document.documentElement.scrollHeight,
-                document.body.scrollHeight,
-                document.documentElement.offsetHeight,
-                document.body.offsetHeight,
-                document.documentElement.clientHeight,
-                document.body.clientHeight,
-                window.innerHeight * 2
-            );
-            
             return {
-                viewport: viewport,
+                viewport: {
+                    width: window.innerWidth,
+                    height: window.innerHeight
+                },
                 full: {
-                    height: height,
-                    width: Math.max(document.documentElement.scrollWidth, 
-                                  document.body.scrollWidth,
-                                  viewport.width)
+                    height: document.documentElement.scrollHeight,
+                    width: document.documentElement.scrollWidth
                 }
             };
         }''')
@@ -1148,126 +1267,70 @@ async def screenshot(
         full_height = dimensions['full']['height']
         full_width = dimensions['full']['width']
 
-        # Calculate chunk parameters
-        min_overlap = 100
-        overlap_height = max(min_overlap, (overlap_percentage / 100) * viewport_height)
-        chunk_height = viewport_height - overlap_height
-        
-        num_chunks = math.ceil((full_height - overlap_height) / chunk_height)
-        num_chunks = max(1, min(num_chunks, max_chunks))
+        filename = f"chunk_{single_chunk_override_id}.png"
+        file_path = os.path.join(output_path, filename)
 
-        # Generate chunk information
-        chunks = []
-        for i in range(num_chunks):
-            scroll_y = i * chunk_height
-            if i == num_chunks - 1:  # Last chunk
-                scroll_y = full_height - viewport_height
+        try:
+            await page.screenshot( # Take screenshot using Playwright API method for the page object. the page.screenshot 
+                path=file_path,
+                full_page=False,
+                timeout=6000 # Timeout in milliseconds for the screenshot action
+            )
+            logger.info(f"Screenshot saved to {file_path}")
+        except PlaywrightTimeoutError:
+            logger.error(f"Screenshot timeout for viewport {single_chunk_override_id}")
+            return JSONResponse(
+                status_code=500,
+                content={"error": f"Screenshot timeout for viewport {single_chunk_override_id}"}
+            )
 
-            # Clamp scroll position
-            scroll_y = max(0, min(scroll_y, full_height - viewport_height))
+        duration = (datetime.now() - start_time).total_seconds()
+        logger.info(f"Screenshot completed in {duration:.3f} seconds")
 
-            # Calculate actual coordinates and dimensions for this chunk
-            is_last_chunk = (i == num_chunks - 1)
-            
-            # For the last chunk, calculate its actual visible height
-            chunk_visible_height = viewport_height
-            if is_last_chunk:
-                chunk_visible_height = full_height - scroll_y
-            
-            chunk_info = {
-                "chunk_number": i + 1,
-                "file_path": os.path.join(output_path, f"chunk_{i + 1}.png"),
+        return JSONResponse(content={
+            "status": "success",
+            "message": "Viewport screenshot taken",
+            "chunks": [{
+                "chunk_number": 1,
+                "file_path": file_path,
                 "coordinates": {
-                    "top": scroll_y,
-                    "bottom": scroll_y + chunk_visible_height,
+                    "top": 0,
+                    "bottom": viewport_height,
                     "left": 0,
                     "right": viewport_width
                 },
                 "dimensions": {
-                    "height": chunk_visible_height,
+                    "height": viewport_height,
                     "width": viewport_width,
-                    "is_last_chunk": is_last_chunk
+                    "is_last_chunk": True
                 },
-                "scroll_position": scroll_y
-            }
-            chunks.append(chunk_info)
-
-        # Take screenshots with increased timeout
-        for chunk in chunks:
-            logger.info(f"Processing chunk {chunk['chunk_number']}/{num_chunks} at scroll position {chunk['scroll_position']}")
-            
-            # Scroll to position with smoother handling
-            await retry_evaluate(page, f'''async () => {{
-                window.scrollTo({{
-                    top: {chunk['scroll_position']},
-                    left: 0,
-                    behavior: 'smooth'
-                }});
-                
-                // Wait for scroll and any animations
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Ensure exact position
-                window.scrollTo(0, {chunk['scroll_position']});
-            
-            }}''')
-
-            await page.wait_for_load_state("networkidle")
-            await page.wait_for_timeout(wait_after_scroll)  # Final rendering stabilization
-
-            try:
-                # Take screenshot with increased timeout
-                await page.screenshot(
-                    path=chunk["file_path"],
-                    full_page=False,
-                    timeout=60000  # 60 second timeout
-                )
-            except PlaywrightTimeoutError:
-                logger.error(f"Screenshot timeout for chunk {chunk['chunk_number']}")
-                return JSONResponse(
-                    status_code=500,
-                    content={"error": f"Screenshot timeout for chunk {chunk['chunk_number']}"}
-                )
-
-        # Scroll back to top
-        await retry_evaluate(page, '''async () => {
-            window.scrollTo({top: 0, left: 0, behavior: 'smooth'});
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }''')
-
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"Screenshot process completed in {duration:.3f} seconds.")
-
-        return JSONResponse(content={
-            "status": "success",
-            "message": "Chunked screenshots taken",
-            "chunks": chunks,
-            "num_chunks": len(chunks),
+                "scroll_position": 0
+            }],
+            "num_chunks": 1,
             "overlap_percentage": overlap_percentage,
             "page_dimensions": {
                 "viewport_height": viewport_height,
                 "viewport_width": viewport_width,
                 "full_height": full_height,
                 "full_width": full_width,
-                "chunk_height": chunk_height,
-                "overlap_height": overlap_height
-            }
+                "chunk_height": viewport_height,
+                "overlap_height": 0
+            },
+            "duration_seconds": duration
         })
 
     except Exception as e:
         logger.error(f"Error during screenshot process: {str(e)}", exc_info=True)
         return JSONResponse(
             status_code=500,
-            content={
-                "error": f"Screenshot error: {str(e)}",
-                "details": str(e)
-            }
+            content={"error": f"Screenshot error: {str(e)}", "details": str(e)}
         )
+
 
 @app.post("/resize-window")
 async def resize_window(
     width: int = Query(gt=0, lt=10000),
-    height: int = Query(gt=0, lt=10000)
+    height: int = Query(gt=0, lt=80000)
 ) -> JSONResponse:
     """
     Resize the browser window and viewport to specified dimensions.
