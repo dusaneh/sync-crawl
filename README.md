@@ -12,7 +12,6 @@ Sync-crawl provides a framework for automating web application interactions by a
 - [Architecture Overview](docs/architecture.md)
 - [Configuration Guide](docs/configuration.md)
 - [API Reference](docs/api.md)
-- [Development Guide](docs/development.md)
 
 ## Quick Start
 
