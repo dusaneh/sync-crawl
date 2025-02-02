@@ -3331,3 +3331,7 @@
 2025-01-26 19:54:17,171 - Jupyter Notebook - <module> - Line: 377 - INFO - Completed evaluation of the run screenshots
 2025-01-26 19:54:17,411 - Jupyter Notebook - <module> - Line: 407 - INFO - Goal not achieved. Continuing to next run. Advice lenght is 705 characters and overall summary is 381 characters
 2025-01-26 19:54:17,483 - Jupyter Notebook - <module> - Line: 458 - INFO - PI: 0080 Progress made. Goal not yet fully achieved. Incrementing run_id to 8 and resetting run_rerun_ct to 0
+2025-02-02 15:10:55,824 - helper - <module> - Line: 916 - INFO - Running on Windows
+2025-02-02 15:17:49,246 - helper - navigate_to_url_from_metadata - Line: 1726 - ERROR - Error during navigation: HTTPConnectionPool(host='127.0.0.1', port=8000): Max retries exceeded with url: /navigate (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000201BFEBE870>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-02-02 15:17:49,465 - Jupyter Notebook - <module> - Line: 29 - INFO - Starting workflow add_non_inventory_product for intuit
+2025-02-02 15:18:04,635 - fastAPIServ - lifespan - Line: 144 - INFO - Starting Playwright...
