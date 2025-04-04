@@ -495,19 +495,24 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
 
     {dims}
 
-    -Your task is to analyze the next steps required to accomplish the given page action based ONLY on what you can observe in the screenshot, considering any prior action history. 
+    -Your task is to analyze the next step required to accomplish the given page action based ONLY on what you can observe in the screenshot, considering any prior action history. 
+    -After each step (consisting of possibly multiple actions) a verification phase will commence. So, a step should not take actions which change the state of the page without first verifying the outcome of the actions taken (e.g. submitting a form without first verifying the form fields are correct).
     -Behave like an expert test user and suggest appropriate actions to complete the page action. Make reasonable assumptions if needed. Try to suggest actions which are generalizable and don't pertain to a currently logged in user's data or product configuration. You will recieve screenshots after every action so you can see the results of your actions. 
-    -Do not assume you know what the next state/page change will be and try to take actions with that assumpiton (like clicking dropdown items that may not be visible yet). 
-    -Make use of dropdown arrows / chevrons / expandable sections to get as much information as possible. In those cases make sure you target such icons directly.
-    -You will often need to complete forms (text fields, select from dropdown (arrows), etc.) and when doing so use realistic mock data for required fields only in order to traverse the pages.
+    -Do not assume you know what the next state/page change will be and try to take actions with that assumpiton (like clicking dropdown items that may not be visible yet). After exploring dropdown options, separate selecting an option from opening the dropdown as the next step.
+    -You will often need to complete forms (text fields, select from dropdown (arrows), etc.) and when doing so use realistic mock data for required fields only in order to traverse the pages. IMPORTANT: only focus on required fields to save time and avoid unnecessary actions.
     -If using the keyboard to cause an action vs. clicking, chose the keyboard, as it will lead to more precise actions (e.g. Enter to submit a form, Tab to move to the next field, etc.)
+    -Make use of dropdown arrows / chevrons / expandable sections to get as much information as possible. In those cases make sure you target such icons directly.
+    -If the forms have dropdowns you must click the dropdown arrows to see the options and then select an option. Don't begin entering text into a dropdown field without first clicking the dropdown arrow.
+    -You should try to make sure that you confirm the effects of your actions before taking further actions which change state. For exmple, when completing a form make sure the form fields are all entered correctly before submitting the form.
+    -Interact with all form elements in order to create documentation about them.
 
     IMPORTANT GUIDELINES FOR ORGANIZING ACTIONS:
     1. Each action_task represents ONE step in a sequence that must be performed in order
-    2. Use separate action_tasks for steps that must happen sequentially (e.g., first type text, then submit search)
+    2. Use separate action_tasks for steps that must happen sequentially (e.g., enter form fields in sequence, but submit as a separate step.)
     3. Use candidates within an action_task for different ways to achieve the SAME action (e.g., clicking a button vs pressing Enter to submit)
     4. NEVER create separate action_tasks for things that are alternatives of each other - those should be candidates
     5. Each action_task should represent a distinct, necessary step in the workflow
+    6. If an action changes state or leads to a new page, it should be a separate step in order to first verify the outcome before proceeding.
     
     Examples of CORRECT organization:
 
@@ -640,52 +645,160 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
 #         return {"error": "Unexpected error occurred during parsing"}
 import re
 import json
+import re
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+import re
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+import re
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+import re
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+import re
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+import re
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+
+# def parse_json_response(response_text):
+#     """
+#     Parses a JSON-like string that might contain additional formatting such as log messages,
+#     Markdown code blocks, extra newlines, or unexpected characters.
+    
+#     It first attempts to extract JSON content from a markdown code block delimited by 
+#     ```json and ```. If that fails, it falls back to extracting the JSON between 
+#     the first '{' and the last '}'.
+    
+#     Additionally, it attempts to fix unescaped newlines in double-quoted sections.
+    
+#     Returns:
+#         dict: A cleaned and parsed dictionary representation of the JSON content.
+#     """
+#     try:
+#         cleaned_text = None
+#         start_marker = "```json"
+#         end_marker = "```"
+
+#         # Step 1: Extract JSON using string partitioning.
+#         if start_marker in response_text:
+#             # Partition the string at the start_marker.
+#             _, _, remainder = response_text.partition(start_marker)
+#             # Remove any leading whitespace/newlines.
+#             remainder = remainder.lstrip()
+#             # Partition the remainder at the end_marker.
+#             json_content, _, _ = remainder.partition(end_marker)
+#             cleaned_text = json_content.strip()
+#         else:
+#             # Fallback: extract JSON between the first '{' and the last '}'.
+#             first_brace = response_text.find('{')
+#             last_brace = response_text.rfind('}')
+#             if first_brace != -1 and last_brace != -1:
+#                 cleaned_text = response_text[first_brace:last_brace + 1].strip()
+#             else:
+#                 raise ValueError("No JSON object found in the response.")
+
+#         # Step 2: Fix unescaped newlines within double quotes.
+#         def _escape_multiline_in_quotes(match):
+#             content_fixed = match.group(2).replace('\n', '\\n').replace('\r', '\\n')
+#             return f'{match.group(1)}{content_fixed}{match.group(3)}'
+        
+#         cleaned_text = re.sub(
+#             r'(")((?:\\.|[^"\\])*)(")',
+#             _escape_multiline_in_quotes,
+#             cleaned_text,
+#             flags=re.DOTALL
+#         )
+
+#         # Step 3: Parse the cleaned text into a JSON object.
+#         parsed_dict = json.loads(cleaned_text)
+#         return parsed_dict
+
+#     except json.JSONDecodeError as e:
+#         logger.error(f"Error parsing JSON response: {e}. LLM API response is {response_text}")
+#         return {"error": "Failed to parse the response"}
+#     except Exception as e:
+#         logger.error(f"Unexpected error during parsing: {e}. LLM API response is {response_text}")
+#         return {"error": "Failed to parse the response"}
+
+
 
 def parse_json_response(response_text):
     """
-    Parses a JSON-like string that might contain additional formatting, 
-    such as Markdown code blocks, extra newlines, or unexpected characters.
+    Parses a JSON-like string that might contain additional formatting such as log messages,
+    Markdown code blocks, extra newlines, or unexpected characters.
     
-    Additionally attempts to fix unescaped newlines in double-quoted sections.
+    It first attempts to extract JSON content from a markdown code block delimited by 
+    ```json and ```. If that fails, it falls back to extracting the JSON between 
+    the first '{' and the last '}'.
+    
+    Additionally, it attempts to fix unescaped newlines in double-quoted sections.
     
     Returns:
         dict: A cleaned and parsed dictionary representation of the JSON content.
     """
     try:
-        # Step 1: Remove ```json\n or ``` boundaries
-        cleaned_text = re.sub(r'```(?:json)?\n?', '', response_text)
-        cleaned_text = cleaned_text.replace('```', '').strip()
+        cleaned_text = None
+        start_marker = "```json"
+        end_marker = "```"
 
-        # Step 2: Clean stray quotes or whitespace at the edges
-        cleaned_text = cleaned_text.strip('\'" \n')
+        # Step 1: Extract JSON using string partitioning.
+        if start_marker in response_text:
+            # Partition the string at the start_marker.
+            _, _, remainder = response_text.partition(start_marker)
+            # Remove any leading whitespace/newlines.
+            remainder = remainder.lstrip()
+            # Partition the remainder at the end_marker.
+            json_content, _, _ = remainder.partition(end_marker)
+            cleaned_text = json_content.strip()
+        else:
+            # Fallback: extract JSON between the first '{' and the last '}'.
+            first_brace = response_text.find('{')
+            last_brace = response_text.rfind('}')
+            if first_brace != -1 and last_brace != -1:
+                cleaned_text = response_text[first_brace:last_brace + 1].strip()
+            else:
+                raise ValueError("No JSON object found in the response.")
 
-        # Step 3 (Optional): Attempt to fix unescaped newlines inside double quotes.
-        # This is a naive approach: it looks for something like "some text\nsome text"
-        # and converts the literal newline to \n. It's far from perfect,
-        # but it may fix the typical multiline errors in JSON strings.
+        # Step 2: Fix unescaped newlines within double quotes.
         def _escape_multiline_in_quotes(match):
-            # group(1) = opening quote
-            # group(2) = content of the string (possibly with newlines)
-            # group(3) = closing quote
-            # We replace real newlines in group(2) with \n
             content_fixed = match.group(2).replace('\n', '\\n').replace('\r', '\\n')
             return f'{match.group(1)}{content_fixed}{match.group(3)}'
         
-        # Regex explanation:
-        #   ("                - A literal double quote
-        #   (?:\\.|[^"\\])*  - Any number of characters that are either escaped (\\.) 
-        #                      or non-quote / non-backslash ([^"\\])
-        #   )                - Capture that as group 2
-        #   "                - A closing quote
-        # We add the DOTALL/s to handle multiline
         cleaned_text = re.sub(
-            r'(")((?:\\.|[^"\\])*)(")', 
-            _escape_multiline_in_quotes, 
-            cleaned_text, 
+            r'(")((?:\\.|[^"\\])*)(")',
+            _escape_multiline_in_quotes,
+            cleaned_text,
             flags=re.DOTALL
         )
 
-        # Step 4: Finally parse into JSON
+        # Step 3: Parse the cleaned text into a JSON object.
         parsed_dict = json.loads(cleaned_text)
         return parsed_dict
 
@@ -694,7 +807,7 @@ def parse_json_response(response_text):
         return {"error": "Failed to parse the response"}
     except Exception as e:
         logger.error(f"Unexpected error during parsing: {e}. LLM API response is {response_text}")
-        return {"error": "Unexpected error occurred during parsing"}
+        return {"error": "Failed to parse the response"}
 
 
 
@@ -782,19 +895,23 @@ def claude_run(screenshot_path, prompt, model, temperature=0.0):
                     "text": prompt
                 }
             ]
-
+            logger.info(f"Begining Claude LLM API call with {len(message_content)} message parths and {len(prompt)} characters in prompt")
             # Send the message to Claude
-            message = client.messages.create(
-                model=model,
-                temperature=temperature,
-                max_tokens=8192,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": message_content,
-                    }
-                ],
-            )
+            try:
+                message = client.messages.create(
+                    model=model,
+                    temperature=temperature,
+                    max_tokens=8192,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": message_content,
+                        }
+                    ],
+                )
+                logger.info(f"Claude LLM API call completed")
+            except Exception as e:
+                raise Exception(f"Claude API error: {str(e)}")
 
             return message.content[0].text, message
 
@@ -808,7 +925,7 @@ def claude_run(screenshot_path, prompt, model, temperature=0.0):
     with ThreadPoolExecutor() as executor:
         future = executor.submit(_run_claude)
         try:
-            return future.result(timeout=30)  # 30 seconds timeout
+            return future.result(timeout=60)  # 30 seconds timeout
         except concurrent.futures.TimeoutError:
             raise Exception("Request timed out after 30 seconds")
         except Exception as e:
@@ -838,11 +955,13 @@ def analyze_page_actions(screenshot_path, prompt,api):
 
 
         try:
-            response_text,raw = claude_run(screenshot_path, prompt = prompt,model="claude-3-5-sonnet-20241022")
+            #response_text,raw = claude_run(screenshot_path, prompt = prompt,model="claude-3-5-sonnet-20241022")
+            response_text,raw = claude_run(screenshot_path, prompt = prompt,model="claude-3-7-sonnet-20250219")
             logger.info(f"Completed Claude LLM API call")
         except Exception as e:
             print(f"Error occurred: {str(e)}")
             logger.error(f"Error occurred: {str(e)}")
+            logger.info(f"Raw response: {str(raw)}")
         
     
     #print("LLM OUT:",response)
