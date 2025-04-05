@@ -373,15 +373,23 @@ async def health_check():
 
 
 # Add error handling
+from fastapi.responses import JSONResponse
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
     logger.error(f"HTTP error occurred: {exc.detail}")
-    return {"detail": exc.detail, "status_code": exc.status_code}
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail, "status_code": exc.status_code}
+    )
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request, exc):
     logger.error(f"Unhandled error occurred: {str(exc)}", exc_info=True)
-    return {"detail": "Internal server error", "status_code": 500}
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error", "status_code": 500}
+    )
 
 @app.get("/ping")
 async def ping():

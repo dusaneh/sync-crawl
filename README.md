@@ -69,6 +69,8 @@ GOOGLE_API_KEY='your google gemini key here'
 claude_key="your claude key here"
 ```
 
+Also, you will need to be running Python 3.11+
+
 1. Clone the repository:
 ```bash
 git clone [repository-url]

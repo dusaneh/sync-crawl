@@ -1,4 +1,4 @@
-import google.generativeai as genai
+#import google.generativeai as genai
 import base64
 import requests
 import json
@@ -287,6 +287,7 @@ def extract_entities_for_evaluation(payload):
                 "candidates": [
                     {
                         "candidate_id": candidate.get("candidate_id"),
+                        "_need_to_click_dropdown_arrow":candidate.get("_need_to_click_dropdown_arrow"),
                         "element_description": candidate.get("element_description"),
                         "type_text": candidate.get("type_text"),
                         "keyboard_action": candidate.get("keyboard_action"),
@@ -478,7 +479,7 @@ def copy_and_rename_file(old_path, new_path,delete_original=True):
         logger.error(f"Error copying file: {e}")
 
 
-def get_page_action_prompt(workflow_instructions, extra_instructions=None, site_wide_instructions=None,site_description = None, best_image=None,summary = None,advice = None):
+def get_page_action_prompt(workflow_instructions, extra_instructions=None, site_wide_instructions=None,site_description = None, best_image=None,summary = None,advice = None,last_rerun_advice = None):
     
     dims = f"Image: has a width of {best_image['resized_dimensions']['width']} and a height of {best_image['resized_dimensions']['height']}\n"
     
@@ -575,6 +576,7 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
                 "candidates": [  // List of alternative ways to accomplish THIS SPECIFIC step
                     {
                         "image_description":"string",  // Detailed description of the image where the image is located
+                        "_need_to_click_dropdown_arrow":boolean, //if the element has a dropdown arrow or indicator then select True and suggest to click on that part of the element elsewhere.
                         "element_description": "string",  // Detailed visual description of the element and must also include description of location of the element relative to the image boundaries and compared with other elements within the screenshot
                         "action": "string",  // Action type (Only: "click", "type", or "keyboard_action")
                         "type_text": "string",  // Text string to type if action is "type"
@@ -602,6 +604,9 @@ Your task in particular, as a subsystem, is to determine what action(s) to take 
 
     if len(advice) > 0:
         prompt += advice
+
+    if len(last_rerun_advice)>0:
+        prompt += "Use this advice from any failed previous attempts to complete this entire workflow. It may not relate to this step, but consider it non the less: "+last_rerun_advice
 
     return prompt
 
@@ -813,7 +818,7 @@ def parse_json_response(response_text):
 
 
 
-genai.configure(api_key=GOOGLE_API_KEY)
+#genai.configure(api_key=GOOGLE_API_KEY)
 
 
 def upload_to_gemini(path, mime_type=None):
@@ -830,20 +835,20 @@ generation_config = {
     "response_mime_type": "application/json",
 }
 
-model = genai.GenerativeModel(
-    model_name=CR_MODEL_NAME,
-    generation_config=generation_config,
-)
+# model = genai.GenerativeModel(
+#     model_name=CR_MODEL_NAME,
+#     generation_config=generation_config,
+# )
 
 generation_config_unstruct = {
     "temperature": 0,
     "max_output_tokens": 8192,
 }
 
-model_unstruct = genai.GenerativeModel(
-    model_name=CR_MODEL_NAME,
-    generation_config=generation_config_unstruct,
-)
+# model_unstruct = genai.GenerativeModel(
+#     model_name=CR_MODEL_NAME,
+#     generation_config=generation_config_unstruct,
+# )
 
 
 from concurrent.futures import ThreadPoolExecutor
@@ -866,7 +871,12 @@ def claude_run(screenshot_path, prompt, model, temperature=0.0):
                 if os.path.getsize(image_path)> 1000000: # 
                     logger.error(f"Image {image_path} is ~{os.path.getsize(image_path)/1000}KB. It is too large to process.")
                 else:
+
+
+
+
                     try:
+                        ensure_writable_file_path(image_path)
                         with open(image_path, "rb") as image_file:
                             image_base64 = base64.b64encode(image_file.read()).decode('utf-8')
 
@@ -885,7 +895,7 @@ def claude_run(screenshot_path, prompt, model, temperature=0.0):
                             })
                         i+=1
                     except Exception as e:
-                        raise Exception(f"Error processing image {image_path}: {str(e)}")
+                        raise Exception(f"Error accessing or processing image {image_path}: {str(e)}")
 
             logger.info(f"Finished processing images")
             # Prepare the message content
@@ -933,6 +943,9 @@ def claude_run(screenshot_path, prompt, model, temperature=0.0):
 
 def analyze_page_actions(screenshot_path, prompt,api):
     """Analyzes the next steps required to accomplish the given page_action on a screenshot."""
+    raw = None
+
+    response_text = None
 
 
     if api == "gemini":
@@ -959,13 +972,17 @@ def analyze_page_actions(screenshot_path, prompt,api):
             response_text,raw = claude_run(screenshot_path, prompt = prompt,model="claude-3-7-sonnet-20250219")
             logger.info(f"Completed Claude LLM API call")
         except Exception as e:
-            print(f"Error occurred: {str(e)}")
-            logger.error(f"Error occurred: {str(e)}")
+            print(f"Error occurred during Claude run: {str(e)}")
+            logger.error(f"Error occurred during Claude run: {str(e)}")
             logger.info(f"Raw response: {str(raw)}")
         
     
     #print("LLM OUT:",response)
-    response_json = parse_json_response(response_text)
+    try:
+        response_json = parse_json_response(response_text)
+    except Exception as e:
+        print(f"Error occured during parsing: {str(e)}")
+
     return response_json,raw
 
 
@@ -1075,16 +1092,16 @@ def resize_browser_window(width: int, height: int) -> dict:
 def evaluate_run_screenshots(workflow_instructions, site_wide_instructions,site_description, run_rerun_path,dimension_info, previous_step_detail, summary, start_time=None):
     extra_instructions = ''
     action_prompt = get_eval_prompt(workflow_instructions, extra_instructions=extra_instructions, site_wide_instructions=site_wide_instructions,site_description = site_description, dimension_info=dimension_info, previous_step_detail=previous_step_detail, summary=summary)
-    eval_json,raw = analyze_page_actions(screenshot_path=[f'{run_rerun_path}/chunks/resized_chunk_{dimension_info[0]['id']}.png', f'{run_rerun_path}/dots/resized_final_screenshot.png', f'{run_rerun_path}/temp/resized_chunk_{dimension_info[1]['id']}.png'], prompt=action_prompt, api='claude')
+    eval_json,raw = analyze_page_actions(screenshot_path=[f"{run_rerun_path}/chunks/resized_chunk_{dimension_info[0]['id']}.png", f"{run_rerun_path}/dots/resized_final_screenshot.png", f"{run_rerun_path}/temp/resized_chunk_{dimension_info[1]['id']}.png"], prompt=action_prompt, api='claude')
 
     return eval_json
 
 
 # Function to analyze raw screenshot
-def analyze_raw_screenshot(extra_instructions, site_wide_instructions,site_description, resized_image_path, workflow_instructions, best_image,run_id,advice,summary):
+def analyze_raw_screenshot(extra_instructions, site_wide_instructions,site_description, resized_image_path, workflow_instructions, best_image,run_id,advice,last_rerun_advice,summary):
         
 
-    action_prompt = get_page_action_prompt(workflow_instructions, extra_instructions=extra_instructions, site_wide_instructions=site_wide_instructions,site_description=site_description, best_image=best_image,summary=summary,advice = advice)
+    action_prompt = get_page_action_prompt(workflow_instructions, extra_instructions=extra_instructions, site_wide_instructions=site_wide_instructions,site_description=site_description, best_image=best_image,summary=summary,advice = advice,last_rerun_advice = last_rerun_advice)
 
     #print(f"PROMPT for runID {run_id}: ",action_prompt)
 
@@ -1185,8 +1202,14 @@ from PIL import Image, ImageDraw
 # --- Helper functions for ipynb ---
 def write_track_data(track_data, workflow_path):
     """Helper function to write tracking data to JSON file."""
-    with open(f"{workflow_path}/tracking.json", "w") as f:
-        json.dump(track_data, f, indent=4)
+    try: 
+        path_to_use = f"{workflow_path}/tracking.json"
+        ensure_writable_file_path(path_to_use)
+        with open(path_to_use, "w") as f:
+            json.dump(track_data, f, indent=4)
+    except Exception as e:
+        logger.error(f"Cannot write to {path_to_use}: {e}")
+        raise
 
 
 
@@ -1465,12 +1488,12 @@ def analyze_fold_test(
 
 
 
-def perform_llm_analysis(extra_instructions, site_wide_instructions,site_description, run_rerun_path, workflow_instructions, best_image, run_id, start_time,advice,summary):
+def perform_llm_analysis(extra_instructions, site_wide_instructions,site_description, run_rerun_path, workflow_instructions, best_image, run_id, start_time,advice,last_rerun_advice,summary):
     """Performs LLM analysis to generate action plan."""
     #print("Starting vision analysis")
 
 
-    resized_image_path_test = f'{run_rerun_path}/chunks/resized_chunk_{best_image['id']}.png'
+    resized_image_path_test = f"{run_rerun_path}/chunks/resized_chunk_{best_image['id']}.png"
     if not os.path.exists(resized_image_path_test): # Check if the resized image exists
         logger.error(f"Error: Resized image not found at {resized_image_path_test}")
     # else:
@@ -1485,6 +1508,7 @@ def perform_llm_analysis(extra_instructions, site_wide_instructions,site_descrip
         best_image=best_image,
         run_id=run_id,
         advice=advice,
+        last_rerun_advice = last_rerun_advice,
         summary=summary
     )
     #print(f"Total candidates: {len(page_action_json_ranked.get('action_tasks', []))} with lap time: {time.time()-start_time}, about to perform actions")
@@ -1661,6 +1685,23 @@ def setup_workflow_folders(workflow_id):
     }
 
 import os
+
+def ensure_writable_directory(path: str):
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Directory does not exist: {path}")
+    if not os.path.isdir(path):
+        raise NotADirectoryError(f"Path is not a directory: {path}")
+    if not os.access(path, os.W_OK):
+        raise PermissionError(f"No write access to directory: {path}")
+    
+def ensure_writable_file_path(file_path: str):
+    directory = os.path.dirname(file_path) or '.'
+    ensure_writable_directory(directory)
+
+
+
+
+import os
 import requests
 from PIL import Image, ImageDraw
 import json
@@ -1718,8 +1759,18 @@ def test_coordinate_consistency(page_action_json_ranked, workflow_step_path, res
                     results[-1]['dot_error'] = str(e)
                 
     # Save results
-    with open(os.path.join(workflow_step_path, 'coordinate_test_results.json'), 'w') as f:
-        json.dump(results, f, indent=2)
+
+    path_to_save_to = os.path.join(workflow_step_path, 'coordinate_test_results.json')
+
+    try:
+        ensure_writable_file_path(path_to_save_to)
+        with open(os.path.join(workflow_step_path, 'coordinate_test_results.json'), 'w') as f:
+            json.dump(results, f, indent=2)
+    except Exception as e:
+        logger.error(f"Cannot write to {path_to_save_to}: {e}")
+        raise
+
+
     
     return results
 

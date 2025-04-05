@@ -8,6 +8,7 @@ import time
 import json
 import os
 from pathlib import Path
+import helper as hlp
 
 class FolderExistsError(Exception):
     """Raised when attempting to create a folder that already exists."""
@@ -30,6 +31,7 @@ class HierarchicalLogger:
         # Try to load existing data from JSON file
         if self.json_file_path.exists():
             try:
+                hlp.ensure_writable_file_path(self.json_file_path)
                 with open(self.json_file_path, 'r') as f:
                     self.data = json.load(f)
                     # Convert ISO format strings back to datetime objects
@@ -37,6 +39,11 @@ class HierarchicalLogger:
             except json.JSONDecodeError:
                 # If file is corrupt or empty, start fresh
                 self.data = {"workflows": {}}
+
+            except (PermissionError, FileNotFoundError, NotADirectoryError) as e:
+                print(f"Cannot write to file path: {self.json_file_path} -> {e}")
+                raise  # 🔥 re-raise to stop execution
+
         else:
             self.data = {"workflows": {}}
 
@@ -86,7 +93,7 @@ class HierarchicalLogger:
         """Create the standard subdirectories in leaf folders."""
         for subdir in ['dots', 'temp', 'highlights','chunks']:
             subdir_path = folder_path / subdir
-            subdir_path.mkdir(exist_ok=True)
+            subdir_path.mkdir(exist_ok=True,mode=0o755)
 
     def _create_folder_structure(self, workflow_id=None, sample_id=None, rerun_id=None,
                                run_id=None, run_retry_id=None, check_exists=True):
@@ -101,7 +108,7 @@ class HierarchicalLogger:
         if check_exists and folder_path.exists():
             raise FolderExistsError(f"Folder already exists: {folder_path}")
 
-        folder_path.mkdir(parents=True, exist_ok=not check_exists)
+        folder_path.mkdir(parents=True, exist_ok=not check_exists,mode=0o755)
         
         # If this is a leaf node (run_retry level), create standard subdirectories
         if run_retry_id is not None:
@@ -194,7 +201,7 @@ class HierarchicalLogger:
 
 
     def _save_to_json(self):
-        self.json_file_path.parent.mkdir(parents=True, exist_ok=True)
+        self.json_file_path.parent.mkdir(parents=True, exist_ok=True,mode=0o755)
         json_safe_data = self._convert_datetime_objects_to_strings(self.data)
         
         # Write to a temp file first
