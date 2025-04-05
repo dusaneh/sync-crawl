@@ -1,0 +1,142 @@
+{
+  "id": "add_cust_v98-guide-0-0",
+  "description": "To add a new customer in QuickBooks Online, go to the Sales tab, then select Customers, and click New customer. Fill out the customer\u2019s details in the form and hit Save to finish.\n",
+  "topics": [],
+  "few_shot_examples": [],
+  "intent": "add_cust_v98",
+  "steps": [
+    {
+      "id": "add_cust_v98-guide-0-0-step-0",
+      "text": "Click on the Sales tab in the left navigation menu",
+      "friendly_text": "The 'Sales' menu item is located in the left navigation panel, approximately 1/3 of the way down the menu. It has a right-facing arrow indicating it can be expanded. It's positioned below 'Transactions' and above 'Expenses' in the menu hierarchy.",
+      "audio_id": "add_cust_v98-guide-0-0-step-0",
+      "experience_mapping": {
+        "highlighting": [
+          {
+            "ui_selector": ".NavItem__NavLabel-sc-494hzp-2.kvWDdZ"
+          }
+        ],
+        "completeness_validation": [
+          {
+            "action_type": "click",
+            "identifier": ".NavItem__NavLabel-sc-494hzp-2.kvWDdZ"
+          }
+        ]
+      }
+    },
+    {
+      "id": "add_cust_v98-guide-0-0-step-0",
+      "text": "Click the 'New customer' button to open the new customer form",
+      "friendly_text": "A green rectangular button labeled 'New customer' positioned in the top right area of the page. It has white text and is approximately 150 pixels wide. It's located at coordinates x: 960, y: 200, to the right of the 'Customer types' button and below the main navigation tabs.",
+      "audio_id": "add_cust_v98-guide-0-0-step-0",
+      "experience_mapping": {
+        "highlighting": [
+          {
+            "ui_selector": ".Button-label-71e8ba3"
+          }
+        ],
+        "completeness_validation": [
+          {
+            "action_type": "click",
+            "identifier": ".Button-label-71e8ba3"
+          }
+        ]
+      }
+    },
+    {
+      "id": "add_cust_v98-guide-0-0-step-0",
+      "text": "Enter a value in the 'Customer display name' field which is required (marked with an asterisk)",
+      "friendly_text": "The 'Customer display name' input field is a text box located in the upper portion of the form, to the right of the label 'Customer display name *'. It's positioned below the 'Company name' field and to the right of it. The field is approximately in the middle-right area of the form.",
+      "audio_id": "add_cust_v98-guide-0-0-step-0",
+      "experience_mapping": {
+        "highlighting": [
+          {
+            "ui_selector": "#idsDropdownTypeaheadTextField2"
+          }
+        ],
+        "completeness_validation": [
+          {
+            "action_type": "click",
+            "identifier": "#idsDropdownTypeaheadTextField2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "add_cust_v98-guide-0-0-step-1",
+      "text": "Type a customer display name in the field",
+      "friendly_text": "The now-focused 'Customer display name' input field where text will be entered",
+      "audio_id": "add_cust_v98-guide-0-0-step-1",
+      "experience_mapping": {
+        "highlighting": [
+          {
+            "ui_selector": "#idsDropdownTypeaheadTextField2"
+          }
+        ],
+        "completeness_validation": [
+          {
+            "action_type": "type",
+            "identifier": "#idsDropdownTypeaheadTextField2"
+          }
+        ]
+      }
+    },
+    {
+      "id": "add_cust_v98-guide-0-0-step-2",
+      "text": "Enter an email address in the Email field",
+      "friendly_text": "The 'Email' input field is a text box located in the middle portion of the form, below the customer name fields. It's positioned to the left of the 'Phone number' field.",
+      "audio_id": "add_cust_v98-guide-0-0-step-2",
+      "experience_mapping": {
+        "highlighting": [
+          {
+            "ui_selector": "#idsTxtField221"
+          }
+        ],
+        "completeness_validation": [
+          {
+            "action_type": "click",
+            "identifier": "#idsTxtField221"
+          }
+        ]
+      }
+    },
+    {
+      "id": "add_cust_v98-guide-0-0-step-3",
+      "text": "Type an email address in the Email field",
+      "friendly_text": "The now-focused 'Email' input field where text will be entered",
+      "audio_id": "add_cust_v98-guide-0-0-step-3",
+      "experience_mapping": {
+        "highlighting": [
+          {
+            "ui_selector": "#idsTxtField221"
+          }
+        ],
+        "completeness_validation": [
+          {
+            "action_type": "type",
+            "identifier": "#idsTxtField221"
+          }
+        ]
+      }
+    },
+    {
+      "id": "add_cust_v98-guide-0-0-step-4",
+      "text": "Click the Save button to create the customer",
+      "friendly_text": "The 'Save' button is a green button located at the bottom right corner of the form. It has white text that says 'Save'.",
+      "audio_id": "add_cust_v98-guide-0-0-step-4",
+      "experience_mapping": {
+        "highlighting": [
+          {
+            "ui_selector": ".Button-label-71e8ba3"
+          }
+        ],
+        "completeness_validation": [
+          {
+            "action_type": "click",
+            "identifier": ".Button-label-71e8ba3"
+          }
+        ]
+      }
+    }
+  ]
+}

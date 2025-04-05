@@ -1,0 +1,25 @@
+{
+  "workflow_id": "add_cust_v96",
+  "analysis_timestamp": "2025-04-05T22:18:39.033739",
+  "samples": {
+    "0": {
+      "sample_id": "0",
+      "rerun_stats": {
+        "0": {
+          "rerun_id": "0",
+          "is_successful": false,
+          "total_runs": 4,
+          "successful_runs_count": 3,
+          "successful_run_ids": [
+            "0",
+            "1",
+            "2"
+          ],
+          "final_successful_run_retry_path": null,
+          "success_percentage": 75.0
+        }
+      },
+      "cleaned_successful_reruns": {}
+    }
+  }
+}

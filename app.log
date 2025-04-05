@@ -8150,3 +8150,5 @@ TypeError: 'dict' object is not callable
 2025-04-05 14:19:48,391 - helper - _run_claude - Line: 895 - INFO - Finished processing images
 2025-04-05 14:19:48,391 - helper - _run_claude - Line: 903 - INFO - Begining Claude LLM API call with 5 message parths and 1141 characters in prompt
 2025-04-05 14:19:53,916 - helper - _run_claude - Line: 917 - INFO - Claude LLM API call completed
+2025-04-05 14:57:23,172 - fastAPIServ - lifespan - Line: 144 - INFO - Starting Playwright...
+2025-04-05 14:57:30,834 - fastAPIServ - lifespan - Line: 150 - INFO - Connected to existing browser session.
