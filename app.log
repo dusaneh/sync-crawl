@@ -8152,3 +8152,572 @@ TypeError: 'dict' object is not callable
 2025-04-05 14:19:53,916 - helper - _run_claude - Line: 917 - INFO - Claude LLM API call completed
 2025-04-05 14:57:23,172 - fastAPIServ - lifespan - Line: 144 - INFO - Starting Playwright...
 2025-04-05 14:57:30,834 - fastAPIServ - lifespan - Line: 150 - INFO - Connected to existing browser session.
+2025-04-05 14:58:12,484 - helper - <module> - Line: 1052 - INFO - Running on Windows
+2025-04-05 14:58:26,918 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /navigate - Status: 200 - Duration: 7.633s
+2025-04-05 14:59:02,524 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /navigate - Status: 200 - Duration: 7.468s
+2025-04-05 14:59:18,871 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /navigate - Status: 200 - Duration: 4.984s
+2025-04-05 14:59:19,347 - Jupyter Notebook - <module> - Line: 28 - INFO - Starting workflow add_cust_v98 for intuit
+2025-04-05 14:59:26,895 - Jupyter Notebook - <module> - Line: 69 - INFO - Previous run_rerun_path is  and current run_rerun_path is clients/intuit\add_cust_v98\0\0\0\0
+2025-04-05 14:59:26,896 - Jupyter Notebook - <module> - Line: 71 - INFO - Starting run 0 rerun 0 run_rerun 0 in clients/intuit\add_cust_v98\0\0\0\0
+2025-04-05 14:59:26,897 - Jupyter Notebook - <module> - Line: 86 - INFO - It's the first run for the sample. Starting fold screenshot test
+2025-04-05 14:59:26,898 - Jupyter Notebook - fold_screenshot_test - Line: 7 - INFO - Requesting extract_metadata for intuit with starting width 1256 and starting height 1369
+2025-04-05 14:59:27,949 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:27,970 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /extract_metadata - Status: 200 - Duration: 1.071s
+2025-04-05 14:59:27,975 - Jupyter Notebook - fold_screenshot_test - Line: 34 - INFO - Resizing browser to width 1256 and height 1256
+2025-04-05 14:59:28,163 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:28,691 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.709s
+2025-04-05 14:59:28,694 - Jupyter Notebook - fold_screenshot_test - Line: 38 - INFO - Requesting screenshot for chunk 1
+2025-04-05 14:59:28,698 - fastAPIServ - screenshot - Line: 1246 - INFO - Starting screenshot process for viewport 1
+2025-04-05 14:59:28,699 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 14:59:28,717 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 14:59:28,717 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 14:59:28,740 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 14:59:28,740 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:28,957 - fastAPIServ - screenshot - Line: 1287 - INFO - Screenshot saved to clients/intuit\add_cust_v98\0\0\0\0/fold_test\chunk_1.png
+2025-04-05 14:59:28,957 - fastAPIServ - screenshot - Line: 1296 - INFO - Screenshot completed in 0.259 seconds
+2025-04-05 14:59:28,959 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /screenshot - Status: 200 - Duration: 0.262s
+2025-04-05 14:59:28,960 - Jupyter Notebook - fold_screenshot_test - Line: 47 - INFO - Completed screenshot for chunk 1
+2025-04-05 14:59:28,961 - Jupyter Notebook - fold_screenshot_test - Line: 34 - INFO - Resizing browser to width 1256 and height 1276
+2025-04-05 14:59:28,998 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:29,018 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.054s
+2025-04-05 14:59:29,020 - Jupyter Notebook - fold_screenshot_test - Line: 38 - INFO - Requesting screenshot for chunk 2
+2025-04-05 14:59:29,025 - fastAPIServ - screenshot - Line: 1246 - INFO - Starting screenshot process for viewport 2
+2025-04-05 14:59:29,026 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 14:59:29,043 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 14:59:29,043 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 14:59:29,063 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 14:59:29,063 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:29,256 - fastAPIServ - screenshot - Line: 1287 - INFO - Screenshot saved to clients/intuit\add_cust_v98\0\0\0\0/fold_test\chunk_2.png
+2025-04-05 14:59:29,257 - fastAPIServ - screenshot - Line: 1296 - INFO - Screenshot completed in 0.231 seconds
+2025-04-05 14:59:29,259 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /screenshot - Status: 200 - Duration: 0.235s
+2025-04-05 14:59:29,261 - Jupyter Notebook - fold_screenshot_test - Line: 47 - INFO - Completed screenshot for chunk 2
+2025-04-05 14:59:29,315 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:29,342 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.077s
+2025-04-05 14:59:29,344 - Jupyter Notebook - fold_screenshot_test - Line: 55 - INFO - Resizing screenshot 1
+2025-04-05 14:59:29,517 - Jupyter Notebook - fold_screenshot_test - Line: 55 - INFO - Resizing screenshot 2
+2025-04-05 14:59:29,641 - Jupyter Notebook - <module> - Line: 89 - INFO - Completed fold screenshot test. Starting fold test LLM analysis for 2 fold tests
+2025-04-05 14:59:29,642 - Jupyter Notebook - perform_fold_test_llm - Line: 77 - INFO - Requesting fold test llm process because there are 2 fold tests
+2025-04-05 14:59:29,643 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 14:59:30,498 - helper - _run_claude - Line: 867 - INFO - Processing 2 images
+2025-04-05 14:59:30,500 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\0\0/fold_test/resized_chunk_1.png ~227.249KB
+2025-04-05 14:59:30,513 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\0\0/fold_test/resized_chunk_2.png ~223.25KB
+2025-04-05 14:59:30,524 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 14:59:30,525 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 5 message parths and 1141 characters in prompt
+2025-04-05 14:59:33,368 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 14:59:33,369 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 14:59:33,371 - helper - perform_llm_fold_test - Line: 1440 - INFO - Completed fold test LLM call
+2025-04-05 14:59:33,372 - Jupyter Notebook - perform_fold_test_llm - Line: 93 - INFO - Resizing window for best image is resized_chunk_1.png with clarity 5 and 2 relevant elements
+2025-04-05 14:59:33,435 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:33,460 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.081s
+2025-04-05 14:59:33,462 - Jupyter Notebook - <module> - Line: 107 - INFO - First run in the rerun sequence. Deleting advice
+2025-04-05 14:59:33,463 - Jupyter Notebook - <module> - Line: 120 - INFO - Copying screenshot from fold test folder to chunk folder for best image for resized and non rezised for best image id 1
+2025-04-05 14:59:33,468 - Jupyter Notebook - <module> - Line: 166 - INFO - Starting LLM analysis with advice length 0 characters
+2025-04-05 14:59:33,469 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 14:59:34,374 - helper - _run_claude - Line: 867 - INFO - Processing 1 images
+2025-04-05 14:59:34,376 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\0\0/chunks/resized_chunk_1.png ~227.249KB
+2025-04-05 14:59:34,388 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 14:59:34,390 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 3 message parths and 9701 characters in prompt
+2025-04-05 14:59:50,242 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 14:59:50,245 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 14:59:50,248 - Jupyter Notebook - <module> - Line: 182 - INFO - Completed LLM analysis. 1 actions to perform
+2025-04-05 14:59:51,565 - Jupyter Notebook - <module> - Line: 252 - INFO - Sending screenshotting request to API server for 1 actions
+2025-04-05 14:59:51,571 - fastAPIServ - perform_actions - Line: 933 - INFO - Starting perform-actions endpoint.
+2025-04-05 14:59:51,572 - fastAPIServ - perform_actions - Line: 944 - INFO - Ensuring page load state...
+2025-04-05 14:59:51,573 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 14:59:51,589 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 14:59:51,589 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 14:59:51,612 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 14:59:51,613 - fastAPIServ - perform_actions - Line: 946 - INFO - Page load state ensured.
+2025-04-05 14:59:51,613 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=0
+2025-04-05 14:59:51,629 - fastAPIServ - draw_dots_internal - Line: 696 - INFO - Starting internal dot drawing with radial gradient...
+2025-04-05 14:59:51,629 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 14:59:51,647 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 14:59:51,647 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 14:59:51,665 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 14:59:51,665 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:51,676 - fastAPIServ - draw_dots_internal - Line: 771 - INFO - Radial flare dot drawn successfully.
+2025-04-05 14:59:51,693 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:51,747 - fastAPIServ - perform_actions - Line: 980 - INFO - Taking ONE final screenshot of all dots: clients/intuit\add_cust_v98\0\0\0\0\dots\final_screenshot.png
+2025-04-05 14:59:51,938 - fastAPIServ - perform_actions - Line: 983 - INFO - All actions processed successfully.
+2025-04-05 14:59:51,939 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /perform-actions - Status: 200 - Duration: 0.372s
+2025-04-05 14:59:51,943 - Jupyter Notebook - <module> - Line: 265 - INFO - Skipping double checking the image draw dots
+2025-04-05 14:59:51,944 - Jupyter Notebook - <module> - Line: 268 - INFO - Sending action request to API server for 1 actions
+2025-04-05 14:59:51,951 - fastAPIServ - perform_actions - Line: 933 - INFO - Starting perform-actions endpoint.
+2025-04-05 14:59:51,951 - fastAPIServ - perform_actions - Line: 944 - INFO - Ensuring page load state...
+2025-04-05 14:59:51,952 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 14:59:51,970 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 14:59:51,971 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 14:59:51,995 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 14:59:51,995 - fastAPIServ - perform_actions - Line: 946 - INFO - Page load state ensured.
+2025-04-05 14:59:51,996 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=0
+2025-04-05 14:59:52,030 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:52,175 - fastAPIServ - perform_actions - Line: 983 - INFO - All actions processed successfully.
+2025-04-05 14:59:52,175 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /perform-actions - Status: 200 - Duration: 0.225s
+2025-04-05 14:59:52,350 - Jupyter Notebook - <module> - Line: 286 - INFO - Executed run actions for 1 actions
+2025-04-05 14:59:52,351 - Jupyter Notebook - <module> - Line: 294 - INFO - Found 11 out of 1 element metadata in the response
+2025-04-05 14:59:52,438 - Jupyter Notebook - <module> - Line: 331 - INFO - Creating highlighted screenshot with 1 boxes
+2025-04-05 14:59:52,559 - helper - draw_with_cairo - Line: 1836 - INFO - Saved visualization to: clients/intuit\add_cust_v98\0\0\0\0/highlights/highlights.png
+2025-04-05 14:59:54,562 - Jupyter Notebook - <module> - Line: 360 - INFO - Requesting extract_metadata with starting width 1256 and starting height 1369
+2025-04-05 14:59:54,562 - Jupyter Notebook - fold_screenshot_test - Line: 7 - INFO - Requesting extract_metadata for intuit with starting width 1256 and starting height 1369
+2025-04-05 14:59:56,299 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:56,320 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /extract_metadata - Status: 200 - Duration: 1.754s
+2025-04-05 14:59:56,324 - Jupyter Notebook - fold_screenshot_test - Line: 34 - INFO - Resizing browser to width 1256 and height 1256
+2025-04-05 14:59:56,384 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:56,405 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.074s
+2025-04-05 14:59:56,407 - Jupyter Notebook - fold_screenshot_test - Line: 38 - INFO - Requesting screenshot for chunk 1
+2025-04-05 14:59:56,412 - fastAPIServ - screenshot - Line: 1246 - INFO - Starting screenshot process for viewport 1
+2025-04-05 14:59:56,413 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 14:59:56,432 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 14:59:56,432 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 14:59:56,451 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 14:59:56,452 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:56,641 - fastAPIServ - screenshot - Line: 1287 - INFO - Screenshot saved to clients/intuit\add_cust_v98\0\0\0\0/fold_test_temp\chunk_1.png
+2025-04-05 14:59:56,642 - fastAPIServ - screenshot - Line: 1296 - INFO - Screenshot completed in 0.230 seconds
+2025-04-05 14:59:56,644 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /screenshot - Status: 200 - Duration: 0.233s
+2025-04-05 14:59:56,646 - Jupyter Notebook - fold_screenshot_test - Line: 47 - INFO - Completed screenshot for chunk 1
+2025-04-05 14:59:56,647 - Jupyter Notebook - fold_screenshot_test - Line: 34 - INFO - Resizing browser to width 1256 and height 1256
+2025-04-05 14:59:56,677 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:56,695 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.045s
+2025-04-05 14:59:56,697 - Jupyter Notebook - fold_screenshot_test - Line: 38 - INFO - Requesting screenshot for chunk 2
+2025-04-05 14:59:56,700 - fastAPIServ - screenshot - Line: 1246 - INFO - Starting screenshot process for viewport 2
+2025-04-05 14:59:56,701 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 14:59:56,728 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 14:59:56,728 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 14:59:56,758 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 14:59:56,758 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:56,958 - fastAPIServ - screenshot - Line: 1287 - INFO - Screenshot saved to clients/intuit\add_cust_v98\0\0\0\0/fold_test_temp\chunk_2.png
+2025-04-05 14:59:56,958 - fastAPIServ - screenshot - Line: 1296 - INFO - Screenshot completed in 0.259 seconds
+2025-04-05 14:59:56,962 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /screenshot - Status: 200 - Duration: 0.262s
+2025-04-05 14:59:56,964 - Jupyter Notebook - fold_screenshot_test - Line: 47 - INFO - Completed screenshot for chunk 2
+2025-04-05 14:59:57,019 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 14:59:57,048 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.080s
+2025-04-05 14:59:57,050 - Jupyter Notebook - fold_screenshot_test - Line: 55 - INFO - Resizing screenshot 1
+2025-04-05 14:59:57,185 - Jupyter Notebook - fold_screenshot_test - Line: 55 - INFO - Resizing screenshot 2
+2025-04-05 14:59:57,320 - Jupyter Notebook - <module> - Line: 364 - INFO - Completed retro/temp fold screenshot test. Starting fold test LLM analysis for 2 fold tests
+2025-04-05 14:59:57,321 - Jupyter Notebook - perform_fold_test_llm - Line: 77 - INFO - Requesting fold test llm process because there are 2 fold tests
+2025-04-05 14:59:57,323 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 14:59:58,252 - helper - _run_claude - Line: 867 - INFO - Processing 2 images
+2025-04-05 14:59:58,255 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\0\0/fold_test_temp/resized_chunk_1.png ~287.341KB
+2025-04-05 14:59:58,276 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\0\0/fold_test_temp/resized_chunk_2.png ~287.341KB
+2025-04-05 14:59:58,291 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 14:59:58,293 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 5 message parths and 1141 characters in prompt
+2025-04-05 15:00:01,359 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 15:00:01,361 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 15:00:01,362 - helper - perform_llm_fold_test - Line: 1440 - INFO - Completed fold test LLM call
+2025-04-05 15:00:01,364 - Jupyter Notebook - perform_fold_test_llm - Line: 93 - INFO - Resizing window for best image is resized_chunk_1.png with clarity 5 and 3 relevant elements
+2025-04-05 15:00:01,436 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:01,469 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.095s
+2025-04-05 15:00:01,476 - Jupyter Notebook - <module> - Line: 368 - INFO - Completed retro/temp fold test screenshot LLM analysis and the dimensions of the best image ID 1 are {'height': 1256, 'width': 1256}
+2025-04-05 15:00:01,478 - Jupyter Notebook - <module> - Line: 371 - INFO - Copying screenshot from 'fold_test_temp' folder to 'temp' folder for best image for resized and non rezised for best image id 1
+2025-04-05 15:00:01,483 - Jupyter Notebook - <module> - Line: 379 - INFO - Starting evaluation of the run screenshots
+2025-04-05 15:00:01,485 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 15:00:02,477 - helper - _run_claude - Line: 867 - INFO - Processing 3 images
+2025-04-05 15:00:02,479 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\0\0/chunks/resized_chunk_1.png ~227.249KB
+2025-04-05 15:00:02,481 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\0\0/dots/resized_final_screenshot.png ~229.899KB
+2025-04-05 15:00:02,493 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\0\0/temp/resized_chunk_1.png ~287.341KB
+2025-04-05 15:00:02,505 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 15:00:02,507 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 7 message parths and 9030 characters in prompt
+2025-04-05 15:00:26,132 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 15:00:26,133 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 15:00:26,134 - Jupyter Notebook - <module> - Line: 391 - INFO - Completed evaluation of the run screenshots
+2025-04-05 15:00:27,163 - Jupyter Notebook - <module> - Line: 421 - INFO - Goal not achieved. Continuing to next run. Advice lenght is 570 characters and overall summary is 209 characters
+2025-04-05 15:00:27,480 - Jupyter Notebook - <module> - Line: 472 - INFO - PI: 0010 Progress made. Goal not yet fully achieved. Incrementing run_id to 1 and resetting run_rerun_ct to 0
+2025-04-05 15:00:27,481 - Jupyter Notebook - <module> - Line: 69 - INFO - Previous run_rerun_path is clients/intuit\add_cust_v98\0\0\0\0 and current run_rerun_path is clients/intuit\add_cust_v98\0\0\1\0
+2025-04-05 15:00:27,481 - Jupyter Notebook - <module> - Line: 71 - INFO - Starting run 1 rerun 0 run_rerun 0 in clients/intuit\add_cust_v98\0\0\1\0
+2025-04-05 15:00:27,482 - Jupyter Notebook - <module> - Line: 126 - INFO - Subsequent run in the same rerun sequence. Reusing data from previous run. Advice length is 682 characters
+2025-04-05 15:00:27,483 - Jupyter Notebook - <module> - Line: 134 - INFO - Copying screenshot from temp to new run folder: clients/intuit\add_cust_v98\0\0\0\0/temp to clients/intuit\add_cust_v98\0\0\1\0/chunks
+2025-04-05 15:00:27,486 - Jupyter Notebook - <module> - Line: 166 - INFO - Starting LLM analysis with advice length 682 characters
+2025-04-05 15:00:27,488 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 15:00:28,357 - helper - _run_claude - Line: 867 - INFO - Processing 1 images
+2025-04-05 15:00:28,360 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\1\0/chunks/resized_chunk_1.png ~287.341KB
+2025-04-05 15:00:28,371 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 15:00:28,373 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 3 message parths and 10763 characters in prompt
+2025-04-05 15:00:47,132 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 15:00:47,134 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 15:00:47,136 - Jupyter Notebook - <module> - Line: 182 - INFO - Completed LLM analysis. 1 actions to perform
+2025-04-05 15:00:48,695 - Jupyter Notebook - <module> - Line: 252 - INFO - Sending screenshotting request to API server for 1 actions
+2025-04-05 15:00:48,701 - fastAPIServ - perform_actions - Line: 933 - INFO - Starting perform-actions endpoint.
+2025-04-05 15:00:48,702 - fastAPIServ - perform_actions - Line: 944 - INFO - Ensuring page load state...
+2025-04-05 15:00:48,704 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:00:48,724 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:00:48,725 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:00:48,745 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:00:48,745 - fastAPIServ - perform_actions - Line: 946 - INFO - Page load state ensured.
+2025-04-05 15:00:48,746 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=0
+2025-04-05 15:00:48,762 - fastAPIServ - draw_dots_internal - Line: 696 - INFO - Starting internal dot drawing with radial gradient...
+2025-04-05 15:00:48,763 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:00:48,783 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:00:48,784 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:00:48,801 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:00:48,802 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:48,812 - fastAPIServ - draw_dots_internal - Line: 771 - INFO - Radial flare dot drawn successfully.
+2025-04-05 15:00:48,832 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:48,870 - fastAPIServ - perform_actions - Line: 980 - INFO - Taking ONE final screenshot of all dots: clients/intuit\add_cust_v98\0\0\1\0\dots\final_screenshot.png
+2025-04-05 15:00:49,037 - fastAPIServ - perform_actions - Line: 983 - INFO - All actions processed successfully.
+2025-04-05 15:00:49,038 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /perform-actions - Status: 200 - Duration: 0.338s
+2025-04-05 15:00:49,044 - Jupyter Notebook - <module> - Line: 265 - INFO - Skipping double checking the image draw dots
+2025-04-05 15:00:49,045 - Jupyter Notebook - <module> - Line: 268 - INFO - Sending action request to API server for 1 actions
+2025-04-05 15:00:49,050 - fastAPIServ - perform_actions - Line: 933 - INFO - Starting perform-actions endpoint.
+2025-04-05 15:00:49,050 - fastAPIServ - perform_actions - Line: 944 - INFO - Ensuring page load state...
+2025-04-05 15:00:49,051 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:00:49,070 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:00:49,070 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:00:49,100 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:00:49,100 - fastAPIServ - perform_actions - Line: 946 - INFO - Page load state ensured.
+2025-04-05 15:00:49,102 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=0
+2025-04-05 15:00:49,136 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:49,467 - fastAPIServ - perform_actions - Line: 983 - INFO - All actions processed successfully.
+2025-04-05 15:00:49,467 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /perform-actions - Status: 200 - Duration: 0.418s
+2025-04-05 15:00:49,661 - Jupyter Notebook - <module> - Line: 286 - INFO - Executed run actions for 1 actions
+2025-04-05 15:00:49,662 - Jupyter Notebook - <module> - Line: 294 - INFO - Found 11 out of 1 element metadata in the response
+2025-04-05 15:00:49,951 - Jupyter Notebook - <module> - Line: 331 - INFO - Creating highlighted screenshot with 1 boxes
+2025-04-05 15:00:50,312 - helper - draw_with_cairo - Line: 1836 - INFO - Saved visualization to: clients/intuit\add_cust_v98\0\0\1\0/highlights/highlights.png
+2025-04-05 15:00:52,321 - Jupyter Notebook - <module> - Line: 360 - INFO - Requesting extract_metadata with starting width 1256 and starting height 1369
+2025-04-05 15:00:52,322 - Jupyter Notebook - fold_screenshot_test - Line: 7 - INFO - Requesting extract_metadata for intuit with starting width 1256 and starting height 1369
+2025-04-05 15:00:53,366 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:53,381 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /extract_metadata - Status: 200 - Duration: 1.055s
+2025-04-05 15:00:53,383 - Jupyter Notebook - fold_screenshot_test - Line: 34 - INFO - Resizing browser to width 1256 and height 1256
+2025-04-05 15:00:53,414 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:53,433 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.047s
+2025-04-05 15:00:53,435 - Jupyter Notebook - fold_screenshot_test - Line: 38 - INFO - Requesting screenshot for chunk 1
+2025-04-05 15:00:53,439 - fastAPIServ - screenshot - Line: 1246 - INFO - Starting screenshot process for viewport 1
+2025-04-05 15:00:53,440 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:00:53,459 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:00:53,460 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:00:53,480 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:00:53,480 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:53,661 - fastAPIServ - screenshot - Line: 1287 - INFO - Screenshot saved to clients/intuit\add_cust_v98\0\0\1\0/fold_test_temp\chunk_1.png
+2025-04-05 15:00:53,662 - fastAPIServ - screenshot - Line: 1296 - INFO - Screenshot completed in 0.224 seconds
+2025-04-05 15:00:53,663 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /screenshot - Status: 200 - Duration: 0.226s
+2025-04-05 15:00:53,665 - Jupyter Notebook - fold_screenshot_test - Line: 47 - INFO - Completed screenshot for chunk 1
+2025-04-05 15:00:53,666 - Jupyter Notebook - fold_screenshot_test - Line: 34 - INFO - Resizing browser to width 1256 and height 1256
+2025-04-05 15:00:53,698 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:53,713 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.044s
+2025-04-05 15:00:53,715 - Jupyter Notebook - fold_screenshot_test - Line: 38 - INFO - Requesting screenshot for chunk 2
+2025-04-05 15:00:53,719 - fastAPIServ - screenshot - Line: 1246 - INFO - Starting screenshot process for viewport 2
+2025-04-05 15:00:53,719 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:00:53,737 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:00:53,738 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:00:53,757 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:00:53,757 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:53,929 - fastAPIServ - screenshot - Line: 1287 - INFO - Screenshot saved to clients/intuit\add_cust_v98\0\0\1\0/fold_test_temp\chunk_2.png
+2025-04-05 15:00:53,930 - fastAPIServ - screenshot - Line: 1296 - INFO - Screenshot completed in 0.211 seconds
+2025-04-05 15:00:53,931 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /screenshot - Status: 200 - Duration: 0.213s
+2025-04-05 15:00:53,933 - Jupyter Notebook - fold_screenshot_test - Line: 47 - INFO - Completed screenshot for chunk 2
+2025-04-05 15:00:53,973 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:00:53,995 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.059s
+2025-04-05 15:00:53,996 - Jupyter Notebook - fold_screenshot_test - Line: 55 - INFO - Resizing screenshot 1
+2025-04-05 15:00:54,135 - Jupyter Notebook - fold_screenshot_test - Line: 55 - INFO - Resizing screenshot 2
+2025-04-05 15:00:54,274 - Jupyter Notebook - <module> - Line: 364 - INFO - Completed retro/temp fold screenshot test. Starting fold test LLM analysis for 2 fold tests
+2025-04-05 15:00:54,275 - Jupyter Notebook - perform_fold_test_llm - Line: 77 - INFO - Requesting fold test llm process because there are 2 fold tests
+2025-04-05 15:00:54,276 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 15:00:55,197 - helper - _run_claude - Line: 867 - INFO - Processing 2 images
+2025-04-05 15:00:55,199 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\1\0/fold_test_temp/resized_chunk_1.png ~201.29KB
+2025-04-05 15:00:55,210 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\1\0/fold_test_temp/resized_chunk_2.png ~201.29KB
+2025-04-05 15:00:55,220 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 15:00:55,220 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 5 message parths and 1141 characters in prompt
+2025-04-05 15:01:00,756 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 15:01:00,758 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 15:01:00,761 - helper - perform_llm_fold_test - Line: 1440 - INFO - Completed fold test LLM call
+2025-04-05 15:01:00,763 - Jupyter Notebook - perform_fold_test_llm - Line: 93 - INFO - Resizing window for best image is resized_chunk_1.png with clarity 5 and 5 relevant elements
+2025-04-05 15:01:00,841 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:01:00,872 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.103s
+2025-04-05 15:01:00,876 - Jupyter Notebook - <module> - Line: 368 - INFO - Completed retro/temp fold test screenshot LLM analysis and the dimensions of the best image ID 1 are {'height': 1256, 'width': 1256}
+2025-04-05 15:01:00,877 - Jupyter Notebook - <module> - Line: 371 - INFO - Copying screenshot from 'fold_test_temp' folder to 'temp' folder for best image for resized and non rezised for best image id 1
+2025-04-05 15:01:00,882 - Jupyter Notebook - <module> - Line: 379 - INFO - Starting evaluation of the run screenshots
+2025-04-05 15:01:00,884 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 15:01:01,914 - helper - _run_claude - Line: 867 - INFO - Processing 3 images
+2025-04-05 15:01:01,917 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\1\0/chunks/resized_chunk_1.png ~287.341KB
+2025-04-05 15:01:01,920 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\1\0/dots/resized_final_screenshot.png ~289.43KB
+2025-04-05 15:01:01,932 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\1\0/temp/resized_chunk_1.png ~201.29KB
+2025-04-05 15:01:01,943 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 15:01:01,944 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 7 message parths and 9383 characters in prompt
+2025-04-05 15:01:23,320 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 15:01:23,322 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 15:01:23,326 - Jupyter Notebook - <module> - Line: 391 - INFO - Completed evaluation of the run screenshots
+2025-04-05 15:01:24,895 - Jupyter Notebook - <module> - Line: 421 - INFO - Goal not achieved. Continuing to next run. Advice lenght is 675 characters and overall summary is 289 characters
+2025-04-05 15:01:25,464 - Jupyter Notebook - <module> - Line: 472 - INFO - PI: 0020 Progress made. Goal not yet fully achieved. Incrementing run_id to 2 and resetting run_rerun_ct to 0
+2025-04-05 15:01:25,465 - Jupyter Notebook - <module> - Line: 69 - INFO - Previous run_rerun_path is clients/intuit\add_cust_v98\0\0\1\0 and current run_rerun_path is clients/intuit\add_cust_v98\0\0\2\0
+2025-04-05 15:01:25,466 - Jupyter Notebook - <module> - Line: 71 - INFO - Starting run 2 rerun 0 run_rerun 0 in clients/intuit\add_cust_v98\0\0\2\0
+2025-04-05 15:01:25,467 - Jupyter Notebook - <module> - Line: 126 - INFO - Subsequent run in the same rerun sequence. Reusing data from previous run. Advice length is 787 characters
+2025-04-05 15:01:25,467 - Jupyter Notebook - <module> - Line: 134 - INFO - Copying screenshot from temp to new run folder: clients/intuit\add_cust_v98\0\0\1\0/temp to clients/intuit\add_cust_v98\0\0\2\0/chunks
+2025-04-05 15:01:25,471 - Jupyter Notebook - <module> - Line: 166 - INFO - Starting LLM analysis with advice length 787 characters
+2025-04-05 15:01:25,472 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 15:01:26,496 - helper - _run_claude - Line: 867 - INFO - Processing 1 images
+2025-04-05 15:01:26,499 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\2\0/chunks/resized_chunk_1.png ~201.29KB
+2025-04-05 15:01:26,514 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 15:01:26,515 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 3 message parths and 10948 characters in prompt
+2025-04-05 15:01:54,574 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 15:01:54,576 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 15:01:54,581 - Jupyter Notebook - <module> - Line: 182 - INFO - Completed LLM analysis. 5 actions to perform
+2025-04-05 15:02:01,181 - Jupyter Notebook - <module> - Line: 252 - INFO - Sending screenshotting request to API server for 5 actions
+2025-04-05 15:02:01,185 - fastAPIServ - perform_actions - Line: 933 - INFO - Starting perform-actions endpoint.
+2025-04-05 15:02:01,186 - fastAPIServ - perform_actions - Line: 944 - INFO - Ensuring page load state...
+2025-04-05 15:02:01,187 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:01,205 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:01,205 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:01,225 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:01,225 - fastAPIServ - perform_actions - Line: 946 - INFO - Page load state ensured.
+2025-04-05 15:02:01,226 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=0
+2025-04-05 15:02:01,245 - fastAPIServ - draw_dots_internal - Line: 696 - INFO - Starting internal dot drawing with radial gradient...
+2025-04-05 15:02:01,245 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:01,264 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:01,264 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:01,283 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:01,283 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,294 - fastAPIServ - draw_dots_internal - Line: 771 - INFO - Radial flare dot drawn successfully.
+2025-04-05 15:02:01,312 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,384 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=1
+2025-04-05 15:02:01,407 - fastAPIServ - draw_dots_internal - Line: 696 - INFO - Starting internal dot drawing with radial gradient...
+2025-04-05 15:02:01,407 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:01,426 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:01,427 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:01,446 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:01,446 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,461 - fastAPIServ - draw_dots_internal - Line: 771 - INFO - Radial flare dot drawn successfully.
+2025-04-05 15:02:01,492 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,552 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=2
+2025-04-05 15:02:01,581 - fastAPIServ - draw_dots_internal - Line: 696 - INFO - Starting internal dot drawing with radial gradient...
+2025-04-05 15:02:01,581 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:01,608 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:01,608 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:01,664 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:01,664 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,675 - fastAPIServ - draw_dots_internal - Line: 771 - INFO - Radial flare dot drawn successfully.
+2025-04-05 15:02:01,706 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,763 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=3
+2025-04-05 15:02:01,785 - fastAPIServ - draw_dots_internal - Line: 696 - INFO - Starting internal dot drawing with radial gradient...
+2025-04-05 15:02:01,785 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:01,805 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:01,805 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:01,824 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:01,824 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,833 - fastAPIServ - draw_dots_internal - Line: 771 - INFO - Radial flare dot drawn successfully.
+2025-04-05 15:02:01,852 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,889 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=4
+2025-04-05 15:02:01,906 - fastAPIServ - draw_dots_internal - Line: 696 - INFO - Starting internal dot drawing with radial gradient...
+2025-04-05 15:02:01,906 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:01,924 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:01,924 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:01,942 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:01,942 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:01,951 - fastAPIServ - draw_dots_internal - Line: 771 - INFO - Radial flare dot drawn successfully.
+2025-04-05 15:02:01,968 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:02,013 - fastAPIServ - perform_actions - Line: 980 - INFO - Taking ONE final screenshot of all dots: clients/intuit\add_cust_v98\0\0\2\0\dots\final_screenshot.png
+2025-04-05 15:02:02,219 - fastAPIServ - perform_actions - Line: 983 - INFO - All actions processed successfully.
+2025-04-05 15:02:02,219 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /perform-actions - Status: 200 - Duration: 1.035s
+2025-04-05 15:02:02,222 - Jupyter Notebook - <module> - Line: 265 - INFO - Skipping double checking the image draw dots
+2025-04-05 15:02:02,223 - Jupyter Notebook - <module> - Line: 268 - INFO - Sending action request to API server for 5 actions
+2025-04-05 15:02:02,228 - fastAPIServ - perform_actions - Line: 933 - INFO - Starting perform-actions endpoint.
+2025-04-05 15:02:02,228 - fastAPIServ - perform_actions - Line: 944 - INFO - Ensuring page load state...
+2025-04-05 15:02:02,229 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:02,248 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:02,248 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:02,264 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:02,264 - fastAPIServ - perform_actions - Line: 946 - INFO - Page load state ensured.
+2025-04-05 15:02:02,265 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=0
+2025-04-05 15:02:02,297 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:02,405 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=1
+2025-04-05 15:02:02,443 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:04,556 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=2
+2025-04-05 15:02:04,606 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:05,033 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=3
+2025-04-05 15:02:05,074 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:07,667 - fastAPIServ - perform_actions - Line: 952 - INFO - Processing task with action_id=4
+2025-04-05 15:02:07,730 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:08,065 - fastAPIServ - perform_actions - Line: 983 - INFO - All actions processed successfully.
+2025-04-05 15:02:08,066 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /perform-actions - Status: 200 - Duration: 5.840s
+2025-04-05 15:02:08,238 - Jupyter Notebook - <module> - Line: 286 - INFO - Executed run actions for 5 actions
+2025-04-05 15:02:08,239 - Jupyter Notebook - <module> - Line: 294 - INFO - Found 11 out of 5 element metadata in the response
+2025-04-05 15:02:08,955 - Jupyter Notebook - <module> - Line: 331 - INFO - Creating highlighted screenshot with 5 boxes
+2025-04-05 15:02:09,110 - helper - draw_with_cairo - Line: 1836 - INFO - Saved visualization to: clients/intuit\add_cust_v98\0\0\2\0/highlights/highlights.png
+2025-04-05 15:02:11,114 - Jupyter Notebook - <module> - Line: 360 - INFO - Requesting extract_metadata with starting width 1256 and starting height 1369
+2025-04-05 15:02:11,115 - Jupyter Notebook - fold_screenshot_test - Line: 7 - INFO - Requesting extract_metadata for intuit with starting width 1256 and starting height 1369
+2025-04-05 15:02:12,188 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:12,202 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /extract_metadata - Status: 200 - Duration: 1.080s
+2025-04-05 15:02:12,205 - Jupyter Notebook - fold_screenshot_test - Line: 34 - INFO - Resizing browser to width 1256 and height 1256
+2025-04-05 15:02:12,258 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:12,280 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.067s
+2025-04-05 15:02:12,282 - Jupyter Notebook - fold_screenshot_test - Line: 38 - INFO - Requesting screenshot for chunk 1
+2025-04-05 15:02:12,286 - fastAPIServ - screenshot - Line: 1246 - INFO - Starting screenshot process for viewport 1
+2025-04-05 15:02:12,287 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:12,307 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:12,307 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:12,327 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:12,327 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:12,527 - fastAPIServ - screenshot - Line: 1287 - INFO - Screenshot saved to clients/intuit\add_cust_v98\0\0\2\0/fold_test_temp\chunk_1.png
+2025-04-05 15:02:12,528 - fastAPIServ - screenshot - Line: 1296 - INFO - Screenshot completed in 0.242 seconds
+2025-04-05 15:02:12,531 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /screenshot - Status: 200 - Duration: 0.245s
+2025-04-05 15:02:12,533 - Jupyter Notebook - fold_screenshot_test - Line: 47 - INFO - Completed screenshot for chunk 1
+2025-04-05 15:02:12,534 - Jupyter Notebook - fold_screenshot_test - Line: 34 - INFO - Resizing browser to width 1256 and height 1256
+2025-04-05 15:02:12,573 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:12,591 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.054s
+2025-04-05 15:02:12,593 - Jupyter Notebook - fold_screenshot_test - Line: 38 - INFO - Requesting screenshot for chunk 2
+2025-04-05 15:02:12,597 - fastAPIServ - screenshot - Line: 1246 - INFO - Starting screenshot process for viewport 2
+2025-04-05 15:02:12,598 - fastAPIServ - ensure_load_state - Line: 612 - INFO - Waiting for page 'load' state...
+2025-04-05 15:02:12,616 - fastAPIServ - ensure_load_state - Line: 614 - INFO - 'Load' state reached.
+2025-04-05 15:02:12,616 - fastAPIServ - ensure_load_state - Line: 620 - INFO - Waiting for page 'networkidle' state...
+2025-04-05 15:02:12,635 - fastAPIServ - ensure_load_state - Line: 622 - INFO - 'Networkidle' state reached.
+2025-04-05 15:02:12,636 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:12,892 - fastAPIServ - screenshot - Line: 1287 - INFO - Screenshot saved to clients/intuit\add_cust_v98\0\0\2\0/fold_test_temp\chunk_2.png
+2025-04-05 15:02:12,893 - fastAPIServ - screenshot - Line: 1296 - INFO - Screenshot completed in 0.296 seconds
+2025-04-05 15:02:12,895 - fastAPIServ - log_requests - Line: 184 - INFO - Request: GET /screenshot - Status: 200 - Duration: 0.298s
+2025-04-05 15:02:12,899 - Jupyter Notebook - fold_screenshot_test - Line: 47 - INFO - Completed screenshot for chunk 2
+2025-04-05 15:02:12,953 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:12,981 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.078s
+2025-04-05 15:02:12,984 - Jupyter Notebook - fold_screenshot_test - Line: 55 - INFO - Resizing screenshot 1
+2025-04-05 15:02:13,151 - Jupyter Notebook - fold_screenshot_test - Line: 55 - INFO - Resizing screenshot 2
+2025-04-05 15:02:13,294 - Jupyter Notebook - <module> - Line: 364 - INFO - Completed retro/temp fold screenshot test. Starting fold test LLM analysis for 2 fold tests
+2025-04-05 15:02:13,295 - Jupyter Notebook - perform_fold_test_llm - Line: 77 - INFO - Requesting fold test llm process because there are 2 fold tests
+2025-04-05 15:02:13,296 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 15:02:14,273 - helper - _run_claude - Line: 867 - INFO - Processing 2 images
+2025-04-05 15:02:14,276 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\2\0/fold_test_temp/resized_chunk_1.png ~193.866KB
+2025-04-05 15:02:14,287 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\2\0/fold_test_temp/resized_chunk_2.png ~193.866KB
+2025-04-05 15:02:14,304 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 15:02:14,305 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 5 message parths and 1141 characters in prompt
+2025-04-05 15:02:18,975 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 15:02:18,977 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 15:02:18,980 - helper - perform_llm_fold_test - Line: 1440 - INFO - Completed fold test LLM call
+2025-04-05 15:02:18,982 - Jupyter Notebook - perform_fold_test_llm - Line: 93 - INFO - Resizing window for best image is resized_chunk_1.png with clarity 5 and 3 relevant elements
+2025-04-05 15:02:19,057 - fastAPIServ - retry_evaluate - Line: 35 - INFO - Script evaluated successfully: Attempt 1
+2025-04-05 15:02:19,085 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /resize-window - Status: 200 - Duration: 0.097s
+2025-04-05 15:02:19,088 - Jupyter Notebook - <module> - Line: 368 - INFO - Completed retro/temp fold test screenshot LLM analysis and the dimensions of the best image ID 1 are {'height': 1256, 'width': 1256}
+2025-04-05 15:02:19,089 - Jupyter Notebook - <module> - Line: 371 - INFO - Copying screenshot from 'fold_test_temp' folder to 'temp' folder for best image for resized and non rezised for best image id 1
+2025-04-05 15:02:19,095 - Jupyter Notebook - <module> - Line: 379 - INFO - Starting evaluation of the run screenshots
+2025-04-05 15:02:19,096 - helper - analyze_page_actions - Line: 967 - INFO - Sending to Claude LLM API
+2025-04-05 15:02:20,019 - helper - _run_claude - Line: 867 - INFO - Processing 3 images
+2025-04-05 15:02:20,022 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\2\0/chunks/resized_chunk_1.png ~201.29KB
+2025-04-05 15:02:20,027 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\2\0/dots/resized_final_screenshot.png ~210.786KB
+2025-04-05 15:02:20,041 - helper - _run_claude - Line: 870 - INFO - Processing image clients/intuit\add_cust_v98\0\0\2\0/temp/resized_chunk_1.png ~193.866KB
+2025-04-05 15:02:20,061 - helper - _run_claude - Line: 900 - INFO - Finished processing images
+2025-04-05 15:02:20,063 - helper - _run_claude - Line: 908 - INFO - Begining Claude LLM API call with 7 message parths and 11455 characters in prompt
+2025-04-05 15:02:52,861 - helper - _run_claude - Line: 922 - INFO - Claude LLM API call completed
+2025-04-05 15:02:52,863 - helper - analyze_page_actions - Line: 973 - INFO - Completed Claude LLM API call
+2025-04-05 15:02:52,867 - Jupyter Notebook - <module> - Line: 391 - INFO - Completed evaluation of the run screenshots
+2025-04-05 15:02:56,404 - Jupyter Notebook - <module> - Line: 475 - INFO - PI: 0020 Goal achieved. Ending the workflow.
+2025-04-05 19:22:18,904 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 3.103s
+2025-04-05 19:23:20,935 - fastAPIServ - lifespan - Line: 163 - INFO - Closing browser...
+2025-04-05 19:23:20,957 - fastAPIServ - lifespan - Line: 166 - INFO - Stopping Playwright...
+2025-04-05 19:23:24,717 - fastAPIServ - lifespan - Line: 144 - INFO - Starting Playwright...
+2025-04-05 19:23:25,395 - fastAPIServ - lifespan - Line: 150 - INFO - Connected to existing browser session.
+2025-04-05 19:23:32,791 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 3.107s
+2025-04-05 19:25:28,965 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 49.465s
+2025-04-05 19:25:36,168 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 3.077s
+2025-04-05 19:25:57,050 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 3.040s
+2025-04-05 19:26:26,499 - fastAPIServ - lifespan - Line: 163 - INFO - Closing browser...
+2025-04-05 19:26:26,546 - fastAPIServ - lifespan - Line: 166 - INFO - Stopping Playwright...
+2025-04-05 19:26:31,069 - fastAPIServ - lifespan - Line: 144 - INFO - Starting Playwright...
+2025-04-05 19:26:31,724 - fastAPIServ - lifespan - Line: 150 - INFO - Connected to existing browser session.
+2025-04-05 19:26:58,016 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 6.669s
+2025-04-05 19:35:35,550 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 11.652s
+2025-04-05 20:40:47,190 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 4.886s
+2025-04-05 20:42:45,587 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 4.867s
+2025-04-05 20:55:26,255 - fastAPIServ - lifespan - Line: 144 - INFO - Starting Playwright...
+2025-04-05 20:55:32,872 - fastAPIServ - lifespan - Line: 150 - INFO - Connected to existing browser session.
+2025-04-05 20:55:46,450 - fastAPIServ - listen_for_requests - Line: 266 - INFO - 
+[/listen_for_requests]
+2025-04-05 20:55:46,450 - fastAPIServ - listen_for_requests - Line: 267 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:55:46,452 - fastAPIServ - listen_for_requests - Line: 268 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 20:55:46,453 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/banking
+2025-04-05 20:55:46,493 - fastAPIServ - listen_for_requests - Line: 305 - INFO -   Request listener attached. Waiting...
+2025-04-05 20:55:51,080 - fastAPIServ - listen_for_requests - Line: 317 - INFO -   Inactivity threshold reached: 3066ms > 3000ms
+2025-04-05 20:55:51,094 - fastAPIServ - listen_for_requests - Line: 328 - INFO -   Request listener detached.
+2025-04-05 20:55:51,095 - fastAPIServ - listen_for_requests - Line: 330 - INFO - [/listen_for_requests] Returning 0 captured requests.
+
+2025-04-05 20:55:51,097 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 4.651s
+2025-04-05 20:56:01,022 - fastAPIServ - listen_for_requests - Line: 266 - INFO - 
+[/listen_for_requests]
+2025-04-05 20:56:01,022 - fastAPIServ - listen_for_requests - Line: 267 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:56:01,024 - fastAPIServ - listen_for_requests - Line: 268 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 20:56:01,025 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/banking
+2025-04-05 20:56:01,036 - fastAPIServ - listen_for_requests - Line: 305 - INFO -   Request listener attached. Waiting...
+2025-04-05 20:56:08,282 - fastAPIServ - listen_for_requests - Line: 317 - INFO -   Inactivity threshold reached: 3025ms > 3000ms
+2025-04-05 20:56:08,290 - fastAPIServ - listen_for_requests - Line: 328 - INFO -   Request listener detached.
+2025-04-05 20:56:08,303 - fastAPIServ - listen_for_requests - Line: 330 - INFO - [/listen_for_requests] Returning 0 captured requests.
+
+2025-04-05 20:56:08,307 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 7.286s
+2025-04-05 20:56:26,851 - fastAPIServ - listen_for_requests - Line: 266 - INFO - 
+[/listen_for_requests]
+2025-04-05 20:56:26,852 - fastAPIServ - listen_for_requests - Line: 267 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:56:26,854 - fastAPIServ - listen_for_requests - Line: 268 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 20:56:26,854 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/banking
+2025-04-05 20:56:26,863 - fastAPIServ - listen_for_requests - Line: 305 - INFO -   Request listener attached. Waiting...
+2025-04-05 20:56:31,864 - fastAPIServ - listen_for_requests - Line: 317 - INFO -   Inactivity threshold reached: 3174ms > 3000ms
+2025-04-05 20:56:31,879 - fastAPIServ - listen_for_requests - Line: 328 - INFO -   Request listener detached.
+2025-04-05 20:56:31,880 - fastAPIServ - listen_for_requests - Line: 330 - INFO - [/listen_for_requests] Returning 0 captured requests.
+
+2025-04-05 20:56:31,881 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 5.031s
+2025-04-05 20:57:34,210 - fastAPIServ - lifespan - Line: 144 - INFO - Starting Playwright...
+2025-04-05 20:57:35,344 - fastAPIServ - lifespan - Line: 150 - INFO - Connected to existing browser session.
+2025-04-05 20:57:42,695 - fastAPIServ - listen_for_requests - Line: 268 - INFO - 
+[/listen_for_requests]
+2025-04-05 20:57:42,696 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:57:42,697 - fastAPIServ - listen_for_requests - Line: 270 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 20:57:42,698 - fastAPIServ - listen_for_requests - Line: 271 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/banking
+2025-04-05 20:57:42,712 - fastAPIServ - listen_for_requests - Line: 307 - INFO -   Request listener attached. Waiting...
+2025-04-05 20:57:44,677 - fastAPIServ - on_request - Line: 301 - INFO -     => MATCHED: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:57:47,709 - fastAPIServ - listen_for_requests - Line: 319 - INFO -   Inactivity threshold reached: 3032ms > 3000ms
+2025-04-05 20:57:47,715 - fastAPIServ - listen_for_requests - Line: 336 - INFO -   Request listener detached.
+2025-04-05 20:57:47,715 - fastAPIServ - listen_for_requests - Line: 338 - INFO - [/listen_for_requests] Returning 1 captured requests.
+
+2025-04-05 20:57:47,717 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 5.024s
+2025-04-05 20:58:39,946 - fastAPIServ - listen_for_requests - Line: 268 - INFO - 
+[/listen_for_requests]
+2025-04-05 20:58:39,946 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:58:39,948 - fastAPIServ - listen_for_requests - Line: 270 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 20:58:39,949 - fastAPIServ - listen_for_requests - Line: 271 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/get-things-done
+2025-04-05 20:58:39,957 - fastAPIServ - listen_for_requests - Line: 307 - INFO -   Request listener attached. Waiting...
+2025-04-05 20:58:41,671 - fastAPIServ - on_request - Line: 301 - INFO -     => MATCHED: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:58:44,779 - fastAPIServ - listen_for_requests - Line: 319 - INFO -   Inactivity threshold reached: 3107ms > 3000ms
+2025-04-05 20:58:44,802 - fastAPIServ - listen_for_requests - Line: 336 - INFO -   Request listener detached.
+2025-04-05 20:58:44,802 - fastAPIServ - listen_for_requests - Line: 338 - INFO - [/listen_for_requests] Returning 1 captured requests.
+
+2025-04-05 20:58:44,806 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 4.860s
+2025-04-05 20:59:11,720 - fastAPIServ - listen_for_requests - Line: 268 - INFO - 
+[/listen_for_requests]
+2025-04-05 20:59:11,721 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:59:11,722 - fastAPIServ - listen_for_requests - Line: 270 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 20:59:11,723 - fastAPIServ - listen_for_requests - Line: 271 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/get-things-done
+2025-04-05 20:59:11,730 - fastAPIServ - listen_for_requests - Line: 307 - INFO -   Request listener attached. Waiting...
+2025-04-05 20:59:13,589 - fastAPIServ - on_request - Line: 301 - INFO -     => MATCHED: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 20:59:16,604 - fastAPIServ - listen_for_requests - Line: 319 - INFO -   Inactivity threshold reached: 3015ms > 3000ms
+2025-04-05 20:59:16,621 - fastAPIServ - listen_for_requests - Line: 336 - INFO -   Request listener detached.
+2025-04-05 20:59:16,621 - fastAPIServ - listen_for_requests - Line: 338 - INFO - [/listen_for_requests] Returning 1 captured requests.
+
+2025-04-05 20:59:16,625 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 4.906s
+2025-04-05 21:01:18,355 - fastAPIServ - listen_for_requests - Line: 268 - INFO - 
+[/listen_for_requests]
+2025-04-05 21:01:18,356 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 21:01:18,358 - fastAPIServ - listen_for_requests - Line: 270 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 21:01:18,358 - fastAPIServ - listen_for_requests - Line: 271 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/banking
+2025-04-05 21:01:18,365 - fastAPIServ - listen_for_requests - Line: 307 - INFO -   Request listener attached. Waiting...
+2025-04-05 21:01:20,226 - fastAPIServ - on_request - Line: 301 - INFO -     => MATCHED: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 21:01:23,236 - fastAPIServ - listen_for_requests - Line: 319 - INFO -   Inactivity threshold reached: 3009ms > 3000ms
+2025-04-05 21:01:23,251 - fastAPIServ - listen_for_requests - Line: 336 - INFO -   Request listener detached.
+2025-04-05 21:01:23,251 - fastAPIServ - listen_for_requests - Line: 338 - INFO - [/listen_for_requests] Returning 1 captured requests.
+
+2025-04-05 21:01:23,254 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 4.898s
+2025-04-05 21:01:57,567 - fastAPIServ - listen_for_requests - Line: 268 - INFO - 
+[/listen_for_requests]
+2025-04-05 21:01:57,567 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 21:01:57,569 - fastAPIServ - listen_for_requests - Line: 270 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 21:01:57,570 - fastAPIServ - listen_for_requests - Line: 271 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/banking
+2025-04-05 21:01:57,578 - fastAPIServ - listen_for_requests - Line: 307 - INFO -   Request listener attached. Waiting...
+2025-04-05 21:01:59,128 - fastAPIServ - on_request - Line: 301 - INFO -     => MATCHED: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 21:02:02,239 - fastAPIServ - listen_for_requests - Line: 319 - INFO -   Inactivity threshold reached: 3111ms > 3000ms
+2025-04-05 21:02:02,253 - fastAPIServ - listen_for_requests - Line: 336 - INFO -   Request listener detached.
+2025-04-05 21:02:02,254 - fastAPIServ - listen_for_requests - Line: 338 - INFO - [/listen_for_requests] Returning 1 captured requests.
+
+2025-04-05 21:02:02,259 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 4.692s
+2025-04-05 21:04:11,456 - fastAPIServ - listen_for_requests - Line: 268 - INFO - 
+[/listen_for_requests]
+2025-04-05 21:04:11,457 - fastAPIServ - listen_for_requests - Line: 269 - INFO -   watch_url: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 21:04:11,459 - fastAPIServ - listen_for_requests - Line: 270 - INFO -   silence_ms: 3000, max_runtime_ms: 20000
+2025-04-05 21:04:11,459 - fastAPIServ - listen_for_requests - Line: 271 - INFO -   Using page URL: https://sandbox.qbo.intuit.com/app/banking
+2025-04-05 21:04:11,466 - fastAPIServ - listen_for_requests - Line: 307 - INFO -   Request listener attached. Waiting...
+2025-04-05 21:04:13,249 - fastAPIServ - on_request - Line: 301 - INFO -     => MATCHED: https://eventbus.intuit.com/v2/segment/sbseg-qbo-clickstream/t
+2025-04-05 21:04:16,317 - fastAPIServ - listen_for_requests - Line: 319 - INFO -   Inactivity threshold reached: 3069ms > 3000ms
+2025-04-05 21:04:16,325 - fastAPIServ - listen_for_requests - Line: 336 - INFO -   Request listener detached.
+2025-04-05 21:04:16,326 - fastAPIServ - listen_for_requests - Line: 338 - INFO - [/listen_for_requests] Returning 1 captured requests.
+
+2025-04-05 21:04:16,327 - fastAPIServ - log_requests - Line: 184 - INFO - Request: POST /listen_for_requests - Status: 200 - Duration: 4.873s

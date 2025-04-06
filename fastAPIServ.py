@@ -229,14 +229,17 @@ async def navigate_to_state(payload: NavigatePayload):
 
 
 from pydantic import BaseModel
-import time, asyncio
-from fastapi import HTTPException
+import time
+import asyncio
+from fastapi import FastAPI, HTTPException
 
 class ListenRequest(BaseModel):
     watch_url: str = ""           # Empty => capture all requests
     silence_ms: int = 5000        # Wait for this inactivity threshold
     max_runtime_ms: int = 10000   # Absolute max run time
 
+
+# --- Your /listen_for_requests endpoint (CORRECTED) ---
 @app.post("/listen_for_requests")
 async def listen_for_requests(payload: ListenRequest):
     """
@@ -251,27 +254,30 @@ async def listen_for_requests(payload: ListenRequest):
       "max_runtime_ms": 10000
     }
     """
-    global page
+    global page # Access the globally initialized page object
     if not page:
         print("[/listen_for_requests] ERROR: No global page available!")
+        logger.error("[/listen_for_requests] ERROR: No global page available!") # Use logger
         raise HTTPException(status_code=503, detail="No global page available.")
 
     watch_url = payload.watch_url.strip()
     silence_ms = payload.silence_ms
     max_runtime_ms = payload.max_runtime_ms
 
-    print("\n[/listen_for_requests]")
-    print(f"  watch_url: {watch_url or '(none — capturing all)'}")
-    print(f"  silence_ms: {silence_ms}, max_runtime_ms: {max_runtime_ms}")
-    print(f"  Using page URL: {page.url}")
+    # Use logger instead of print for consistency
+    logger.info("\n[/listen_for_requests]")
+    logger.info(f"  watch_url: {watch_url or '(none — capturing all)'}")
+    logger.info(f"  silence_ms: {silence_ms}, max_runtime_ms: {max_runtime_ms}")
+    logger.info(f"  Using page URL: {page.url}")
 
     captured_requests = []
     last_request_time = time.time()    # track last matching request
     start_time = time.time()           # track overall start
 
-    def on_request(req):
-        # Print for debug
-        print(f"  [Request Event] {req.method} {req.url}")
+    # --- CORRECTED on_request function ---
+    def on_request(req): # req is playwright.async_api.Request
+        # Log the request event
+        logger.debug(f"  [Request Event] {req.method} {req.url}")
 
         # If watch_url is empty, we match all. Otherwise, must contain watch_url
         if (not watch_url) or (watch_url in req.url):
@@ -282,45 +288,55 @@ async def listen_for_requests(payload: ListenRequest):
                 "method": req.method,
                 "request_url": req.url,
                 "page_url": page.url,
+                # ***** CORRECTED LINE: Access headers as a property *****
+                "request_headers": req.headers # Gets headers as a dictionary (no parentheses)
             }
             # Capture POST body
             if req.method.upper() == "POST":
+                # Use the .post_data property
                 req_info["post_data"] = req.post_data or ""
+
             captured_requests.append(req_info)
 
-            print(f"    => MATCHED: {req.url}")
+            logger.info(f"    => MATCHED: {req.url}") # Log matched requests
         else:
-            print(f"    => Did NOT match watch_url")
+            logger.debug(f"    => Did NOT match watch_url: {req.url}") # Log non-matches if needed
 
     # Attach listener
     page.on("request", on_request)
-    print("  Request listener attached. Waiting...")
+    logger.info("  Request listener attached. Waiting...")
 
     try:
         # Keep looping until silence or max-time
         while True:
+            # Use asyncio.sleep for cooperative multitasking in async functions
             await asyncio.sleep(0.2)
             elapsed_since_last_request = (time.time() - last_request_time) * 1000
             total_elapsed = (time.time() - start_time) * 1000
 
             if elapsed_since_last_request > silence_ms:
                 # We had no matching requests for `silence_ms`
-                print(f"  Inactivity threshold reached: {elapsed_since_last_request:.0f}ms > {silence_ms}ms")
+                logger.info(f"  Inactivity threshold reached: {elapsed_since_last_request:.0f}ms > {silence_ms}ms")
                 break
 
             if total_elapsed > max_runtime_ms:
                 # We reached max overall runtime
-                print(f"  Max runtime reached: {total_elapsed:.0f}ms > {max_runtime_ms}ms")
+                logger.info(f"  Max runtime reached: {total_elapsed:.0f}ms > {max_runtime_ms}ms")
                 break
 
+    # NOTE: The 'Error occurred in event listener' message in your log
+    # indicates the listener itself raised an exception (the TypeError).
+    # Playwright catches this and emits an 'error' event, but the listener
+    # might stop processing further requests correctly after the error.
+    # It's crucial to detach the listener in the finally block regardless.
     finally:
-        # Detach
+        # Detach listener to prevent memory leaks
+        # This runs even if an error occurred inside the try block
         page.remove_listener("request", on_request)
-        print("  Request listener detached.")
+        logger.info("  Request listener detached.")
 
-    print(f"[/listen_for_requests] Returning {len(captured_requests)} captured requests.\n")
+    logger.info(f"[/listen_for_requests] Returning {len(captured_requests)} captured requests.\n")
     return {"captured_requests": captured_requests}
-
 
 
 @app.get("/health")
